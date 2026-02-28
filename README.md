@@ -1,116 +1,136 @@
-# 智慧物业系统项目说明
+# 物业管理系统总览
 
-## 1. 项目概述
-本项目为“智慧物业”一体化平台，覆盖住户端、员工端与管理员端三类使用场景，提供公告、报修、通行码、论坛、缴费支付等核心物业业务能力。系统采用前后端分离架构：后端基于 Spring Boot 多模块服务，管理员端为 Vue 3 管理后台，住户端与员工端为微信小程序。
+本项目由后端服务、管理员端 Web、用户端小程序、员工端小程序四部分组成，围绕物业管理的登录认证、公告、报修、论坛、出行码、缴费与审核等业务实现端到端闭环。
 
-## 2. 目录结构
-- springboot/：后端多模块服务
-  - core-api：接口层与 MyBatis Mapper 配置
-  - core-auth：认证授权、登录与安全配置
-  - core-business：业务模块（公告、报修、通行码等）
-  - core-common：通用配置与工具（Redis、支付、异常、工具类等）
-  - core-domain：领域实体与 DTO 定义
-  - core-system：系统管理与基础能力
-- vue-project/：管理员 Web 管理端（Vue 3 + Element Plus）
-- xiaochenxu/：住户端微信小程序
-- yuangong_xiaochenxu/：员工端微信小程序
 
-## 3. 技术栈
-### 3.1 后端
-- Spring Boot 3.x、Spring Security + JWT
-- MyBatis + MySQL
-- Redis 缓存
-- 支付宝 SDK
-- Maven 构建，Java 17
 
-### 3.2 管理员端 Web
-- Vue 3 + Vite
-- Element Plus、ECharts、wangeditor
-- Axios、Vue Router
+## 项目结构
 
-### 3.3 小程序端
-- 微信小程序原生框架
-- 组件化页面与自定义组件
+```
+Property management system/
+├─ springboot/                  # 后端（Spring Boot 多模块）
+│  ├─ core-api/                  # 应用入口与资源配置
+│  ├─ core-auth/                 # 登录/认证/鉴权
+│  ├─ core-business/             # 业务模块（论坛/报修/缴费/出行码等）
+│  ├─ core-common/               # 通用配置与工具
+│  ├─ core-domain/               # 实体与 DTO
+│  ├─ core-system/               # 系统管理模块
+│  └─ pom.xml                    # 父工程
+├─ vue_guanliyuan/               # 管理员端（Vue 3 + Vite）
+│  ├─ src/                       # 前端源码
+│  ├─ dist/                      # 构建产物
+│  └─ package.json
+├─ xiaochenxu_yonghu/            # 用户端小程序
+├─ xiaochenxu_yuangong/          # 员工端小程序
+├─ 数据库/
+│  └─ hr888.sql                  # 初始化脚本
+└─ README.md
+```
 
-## 4. 角色与端侧定位
-- 住户端：面向业主/住户，处理日常物业服务与缴费
-- 员工端：面向维修与核销岗位，处理工单与通行码核验
-- 管理员端：面向运营与管理人员，进行全局业务管理与数据统计
+## 技术栈
 
-## 5. 住户端功能详述
-住户端功能详见 [住户端功能详细说明.md](file:///C:/Users/30274/Desktop/xm/xiaochenxu/住户端功能详细说明.md)，核心模块如下：
-- 登录与注册：验证码登录、微信登录、用户注册、JWT Token 管理
-- 个人信息：资料修改、头像更新、密码修改、文件上传
-- 公告：公告列表、详情、已读标记、阅读统计
-- 出行码：生成/刷新、验证、出行记录与统计
-- 报修：提交报修、查询进度、取消、评价
-- 论坛：发帖、查看详情、评论、收藏、审核状态
-- 物业缴费：账单查询、支付订单创建、支付回调与结果查询
-- 运营与监控：日志、性能监控、缓存与安全策略、工程化规范
+- 后端：Spring Boot 3.4.7、MyBatis、Redis、JWT、MySQL、Alipay SDK
+- 管理员端：Vue 3、Vite、Element Plus、Axios、WangEditor
+- 小程序端：微信小程序原生框架
+- 构建：Maven、Node.js
 
-## 6. 员工端功能详述
-员工端功能详见 [员工端功能技术实现详细说明.md](file:///C:/Users/30274/Desktop/xm/yuangong_xiaochenxu/员工端功能技术实现详细说明.md)，核心模块如下：
-- 登录与请求拦截：员工登录、Token 存储、权限拦截
-- 个人信息：基础资料展示、退出登录
-- 公告管理：公告列表与发布
-- 出行码核销：扫码核验、状态更新
-- 维修工单：接单、处理、完成、评价回复
-- 论坛互动：帖子列表、详情、发布、评论、收藏与点赞
+## 组件概览
 
-## 7. 管理员端功能详述
-管理员端功能详见 [管理员端功能技术实现详细说明.md](file:///C:/Users/30274/Desktop/xm/vue-project/管理员端功能技术实现详细说明.md)，核心模块如下：
-- 登录与权限：验证码登录、路由守卫、角色控制
-- 个人信息：管理员资料与头像管理
-- 数据概览：统计概览与可视化图表
-- 公告管理：发布、草稿、详情、删除、阅读情况
-- 出行码管理：通行码列表与状态筛选
-- 报修管理：工单分派、状态管理与取消
-- 论坛管理：帖子置顶/加精/删除、评论管理、禁言
-- 缴费管理：账单查询、月度账单发布、状态管理
-- 扫码核验：上传二维码图片验证并更新通行状态
+- 后端服务：多模块 Spring Boot 服务，对外提供统一 REST API
+- 管理员端：面向物业管理角色的管理后台
+- 用户端小程序：住户侧业务入口，提供报修、缴费、出行码等功能
+- 员工端小程序：员工侧业务入口，提供工单、公告、扫码核验等能力
 
-## 8. 后端模块说明
-后端为 Maven 多模块工程，核心模块职责如下：
-- core-auth：登录、验证码验证、JWT 生成、权限校验
-- core-api：接口与 Mapper 配置，统一 API 入口
-- core-business：公告、报修、通行码、论坛、缴费等业务能力
-- core-common：Redis、异常处理、线程池、支付配置与工具类
-- core-domain：业务实体、DTO、枚举与消息模型
-- core-system：系统管理与基础能力扩展
+## 总体功能
 
-## 9. 核心数据模型（核心实体）
-实体定义集中在 [core-domain](file:///C:/Users/30274/Desktop/xm/springboot/core-domain)：
-- 用户与组织：User、Admin、Employee
-- 公告：Notice、NoticeAttachment、NoticeRead
-- 报修：RepairOrder、RepairCategory、RepairEvaluation、RepairAssignment
-- 通行码：TravelPassRecord
-- 论坛：ForumPost、ForumComment、ForumAttachment、ForumSection
-- 缴费与支付：FeeBill、PayOrder
-- 消息与日志：Message、MessageRecipient、AccessLog
+- 统一登录认证与权限控制
+- 公告发布与阅读闭环
+- 报修工单提交、派单、处理与评价
+- 社区论坛发帖、评论与管理
+- 出行码申请、核验与记录
+- 物业缴费与账单管理
 
-## 10. 关键业务流程
-### 10.1 登录与鉴权
-- 账号登录/微信登录 → JWT Token 生成 → Redis 存储 → 前端持久化 → 请求拦截与鉴权
+## 关键配置
 
-### 10.2 报修流程
-- 住户提交报修 → 工单分派/接单 → 处理中 → 完成 → 住户评价 → 评价回复
+### 后端配置
 
-### 10.3 通行码流程
-- 住户生成通行码 → 员工/门卫扫码验证 → 状态流转（ISSUED→ENTERED→EXITED） → 记录与统计
+配置文件位置：
 
-### 10.4 缴费支付流程
-- 账单生成 → 用户查询与选择 → 创建支付订单 → 支付宝回调 → 状态同步与通知
+- `springboot/core-api/src/main/resources/resources/application.yml`
 
-## 11. 前端运行说明
-### 11.1 管理员端
-- 运行方式：执行 Vite dev/bulid/preview 脚本
-- 依赖说明：详见 [package.json](file:///C:/Users/30274/Desktop/xm/vue-project/package.json)
+需要补充的环境变量（示例）：
 
-### 11.2 小程序端
-- 住户端：使用微信开发者工具导入 xiaochenxu/
-- 员工端：使用微信开发者工具导入 yuangong_xiaochenxu/
+```
+ALIPAY_APP_ID=你的AppId
+ALIPAY_PRIVATE_KEY=你的支付宝私钥
+ALIPAY_PUBLIC_KEY=你的支付宝公钥
+ALIPAY_NOTIFY_URL=你的回调地址
+ALIPAY_RETURN_URL=你的同步返回地址
+WECHAT_APPID=你的小程序AppId
+WECHAT_SECRET=你的小程序AppSecret
+JWT_SECRET=你的JWT签名密钥
+```
 
-## 12. 相关文档索引
-- 住户端功能详细说明：[住户端功能详细说明.md](file:///C:/Users/30274/Desktop/xm/xiaochenxu/住户端功能详细说明.md)
-- 员工端功能技术实现：[员工端功能技术实现详细说明.md](file:///C:/Users/30274/Desktop/xm/yuangong_xiaochenxu/员工端功能技术实现详细说明.md)
-- 管理员端功能技术实现：[管理员端功能技术实现详细说明.md](file:///C:/Users/30274/Desktop/xm/vue-project/管理员端功能技术实现详细说明.md)
+文件上传位置：
+
+- `file.upload-path` 默认指向 `C:\uploads\avatar`
+
+### 管理员端配置
+
+接口地址在 `vue_guanliyuan/src/api/request.js` 中配置：
+
+```
+baseURL: "http://localhost:8080"
+```
+
+如果后端端口或域名变化，请同步修改该配置。
+
+## 运行方式
+
+### 后端
+
+进入后端目录并启动核心模块：
+
+```
+cd springboot
+.\mvnw.cmd -pl core-api -am spring-boot:run
+```
+
+说明：
+
+- 后端应用入口位于 [DemoApplication](file:///e:/grxm/Property%20management%20system/springboot/core-api/src/main/java/com/example/DemoApplication.java)
+- 配置文件位于 [application.yml](file:///e:/grxm/Property%20management%20system/springboot/core-api/src/main/resources/resources/application.yml)
+
+### 前端（管理员端）
+
+```
+cd vue_guanliyuan
+npm install
+npm run dev
+```
+
+### 数据库
+
+将 `数据库/hr888.sql` 导入 MySQL：
+
+```
+mysql -u root -p < 数据库/hr888.sql
+```
+
+### 小程序（用户端/员工端）
+
+使用微信开发者工具分别打开：
+
+- [xiaochenxu_yonghu](file:///e:/grxm/Property%20management%20system/xiaochenxu_yonghu)
+- [xiaochenxu_yuangong](file:///e:/grxm/Property%20management%20system/xiaochenxu_yuangong)
+
+接口地址配置位于：
+
+- [xiaochenxu_yonghu/app.js](file:///e:/grxm/Property%20management%20system/xiaochenxu_yonghu/app.js)
+- [xiaochenxu_yuangong/app.js](file:///e:/grxm/Property%20management%20system/xiaochenxu_yuangong/app.js)
+
+## 其他文档
+
+- [多线程使用指南](/springboot/MULTITHREADING_GUIDE.md)
+- [线程模型详解](/springboot/THREAD_MODEL_EXPLANATION.md)
+>>>>>>> 010bde43 (补充md)
