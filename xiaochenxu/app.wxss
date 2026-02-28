@@ -1,0 +1,108 @@
+/**app.wxss**/
+page {
+  /* 品牌色 */
+  --primary-color: #3c7fff;
+  --primary-light: #eaf0ff;
+  --primary-gradient: linear-gradient(135deg, #3c7fff, #6b8bff);
+  
+  /* 辅助色 */
+  --danger-color: #fa5151;
+  --warning-color: #ffc300;
+  --info-color: #1989fa;
+  
+  /* 文本色 */
+  --text-main: #333333;
+  --text-content: #666666;
+  --text-secondary: #999999;
+  --text-placeholder: #cccccc;
+  
+  /* 背景边框 */
+  --bg-color: #f6f7fb;
+  --border-color: #e5e7eb;
+  --card-shadow: 0 12rpx 28rpx rgba(15, 23, 42, 0.08);
+  
+  /* 布局 */
+  --card-radius: 24rpx;
+  --btn-radius: 48rpx;
+  --page-padding: 30rpx;
+  
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica,
+    Segoe UI, Arial, Roboto, 'PingFang SC', 'miui', 'Hiragino Sans GB', 'Microsoft Yahei',
+    sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  box-sizing: border-box;
+}
+
+.container {
+  min-height: 100vh;
+  box-sizing: border-box;
+  background-color: var(--bg-color);
+}
+
+/* 通用卡片 */
+.card {
+  background: #ffffff;
+  border-radius: var(--card-radius);
+  padding: 30rpx;
+  margin: 0 var(--page-padding) 24rpx;
+  box-shadow: var(--card-shadow);
+}
+
+/* 通用按钮 */
+.btn-primary {
+  background: var(--primary-color);
+  color: #ffffff;
+  border-radius: var(--btn-radius);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s;
+}
+
+.btn-primary:active {
+  opacity: 0.8;
+}
+
+.btn-hover {
+  opacity: 0.8;
+}
+
+/* 通用Flex布局 */
+.flex-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.flex-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* 文本截断 */
+.text-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.text-ellipsis-2 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}

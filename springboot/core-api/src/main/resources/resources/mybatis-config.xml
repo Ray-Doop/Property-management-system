@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+    <!-- 开启驼峰命名转换 -->
+    <settings>
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+        <setting name="logImpl" value="STDOUT_LOGGING"/>
+        <setting name="lazyLoadingEnabled" value="false"/>
+        <setting name="aggressiveLazyLoading" value="false"/>
+    </settings>
+
+    <!-- 配置环境（数据库连接） -->
+    <environments default="development">
+        <environment id="development">
+            <transactionManager type="JDBC"/>
+
+            <dataSource type="POOLED">
+                <property name="driver" value="com.mysql.cj.jdbc.Driver"/>
+                <property name="url" value="jdbc:mysql://localhost:3306/hr?useSSL=false&amp;serverTimezone=Asia/Shanghai"/>
+                <property name="username" value="root"/>
+                <property name="password" value="123456"/>
+            </dataSource>
+        </environment>
+    </environments>
+
+    <!-- Mapper映射文件路径 -->
+    <mappers>
+        <package name="com.example.modules.system.auth.mapper"/>
+        <package name="com.example.modules.system.admin.mapper"/>
+        <package name="com.example.modules.system.employee.mapper"/>
+        <package name="com.example.modules.system.loginlog.mapper"/>
+        <package name="com.example.modules.system.stats.mapper"/>
+        <package name="com.example.modules.forum.mapper"/>
+        <package name="com.example.modules.repair.mapper"/>
+        <package name="com.example.modules.notice.mapper"/>
+        <package name="com.example.modules.pay.mapper"/>
+        <package name="com.example.modules.fee.mapper"/>
+        <package name="com.example.modules.travelpass.mapper"/>
+    </mappers>
+</configuration>

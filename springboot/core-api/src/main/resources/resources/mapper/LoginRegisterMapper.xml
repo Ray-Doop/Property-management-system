@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.modules.auth.mapper.LoginRegisterMapper">
+    <insert id="insert" parameterType="com.example.entity.User">
+        INSERT INTO user (
+            username,
+            password,
+            phone,
+            building_no,
+            unit_no,
+            room_no,
+            nickname,
+            status,
+            register_time,
+            avatar_url,
+            remark
+        ) VALUES (
+                     #{username},
+                     #{password},
+                     #{phone},
+                     #{buildingNo},
+                     #{unitNo},
+                     #{roomNo},
+                     #{nickname},
+                     0,
+                     NOW(),
+                  #{avatarUrl},
+                  #{remark}
+                 )
+    </insert>
+
+    <update id="uplastlogintime">
+        UPDATE user
+        SET last_login_time = NOW()
+        WHERE user_id = #{userId} <!-- 参数占位符 -->
+    </update>
+    <update id="UpdatePassword">
+        UPDATE user
+        SET password = #{password}
+        WHERE username = #{username}
+    </update>
+
+    <update id="updateAvatar">
+        UPDATE user
+        SET avatar_url = #{avatarUrl}
+        WHERE user_id = #{userId}
+    </update>
+    <update id="UpdateUserData">
+        UPDATE user
+        <set>
+            <if test="nickname != null and nickname != ''">
+                nickname = #{nickname},
+            </if>
+            <if test="phone != null and phone != ''">
+                phone = #{phone},
+            </if>
+            <if test="buildingNo != null and buildingNo != ''">
+                building_no = #{buildingNo},
+            </if>
+            <if test="unitNo != null and unitNo != ''">
+                unit_no = #{unitNo},
+            </if>
+            <if test="roomNo != null and roomNo != ''">
+                room_no = #{roomNo},
+            </if>
+            <if test="area != null and area != ''">
+                area = #{area},
+            </if>
+        </set>
+        WHERE user_id = #{userId}
+    </update>
+
+    <update id="passUser">
+        UPDATE user
+        SET status=1
+        WHERE username = #{username}
+    </update>
+
+    <update id="refuseUser">
+        UPDATE user
+        SET status=4, remark=#{remark}
+        WHERE user_id = #{userId}
+    </update>
+
+    <update id="muteUser">
+        UPDATE user
+        SET status=2, remark=#{remark}
+        WHERE user_id = #{userId}
+    </update>
+
+    <update id="banUser">
+        UPDATE user
+        SET status=3, remark=#{remark}
+        WHERE user_id = #{userId}
+    </update>
+
+
+    <select id="selectUserData" resultType="com.example.entity.User">
+        select * from user where user_id=#{userId}
+    </select>
+
+    <select id="selectAllUser" resultType="com.example.entity.User">
+        select * from user
+        <where>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+            <if test="username != null and username != ''">
+                AND username like concat('%', #{username}, '%')
+            </if>
+            <if test="nickname != null and nickname != ''">
+                AND nickname like concat('%', #{nickname}, '%')
+            </if>
+        </where>
+    </select>
+
+    <select id="selectUserApproval" resultType="com.example.entity.User">
+        select * from user where status=0
+    </select>
+    <select id="selectAdminByUsername" resultType="com.example.entity.Admin">
+        select * from admin where username=#{username}
+    </select>
+    
+    <delete id="deleteUser">
+        DELETE FROM user WHERE user_id = #{userId}
+    </delete>
+    
+    <update id="unmuteUser">
+        UPDATE user SET status = 1, remark = NULL WHERE user_id = #{userId}
+    </update>
+
+    <select id="selectEmployeeByUsername" resultType="com.example.entity.Employee">
+        select * from employee where username=#{username}
+    </select>
+    
+    <!-- 管理员修改密码 -->
+    <update id="updateAdminPassword">
+        UPDATE admin
+        SET password = #{password}
+        WHERE username = #{username}
+    </update>
+    
+    <!-- 管理员修改资料 -->
+    <update id="updateAdminData">
+        UPDATE admin
+        <set>
+            <if test="username != null and username != ''">
+                username = #{username},
+            </if>
+            <if test="nickname != null and nickname != ''">
+                nickname = #{nickname},
+            </if>
+            <if test="phone != null and phone != ''">
+                phone = #{phone},
+            </if>
+            <if test="email != null and email != ''">
+                email = #{email},
+            </if>
+            <if test="remark != null">
+                remark = #{remark},
+            </if>
+        </set>
+        WHERE admin_id = #{adminId}
+    </update>
+    
+    <!-- 管理员修改头像 -->
+    <update id="updateAdminAvatar">
+        UPDATE admin
+        SET avatar = #{avatarUrl}
+        WHERE admin_id = #{adminId}
+    </update>
+
+</mapper>

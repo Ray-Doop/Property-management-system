@@ -1,0 +1,57 @@
+<view class="container">
+  <view class="bg-top"></view>
+  <view class="hero-card">
+    <view class="profile">
+      <image class="avatar" src="{{avatarSrc || defaultAvatar}}" mode="aspectFill" binderror="handleAvatarError"></image>
+      <view class="profile-text">
+        <text class="name">{{user.nickname}}</text>
+        <text class="type">业主通行</text>
+      </view>
+    </view>
+    <view class="status-chip">有效中</view>
+  </view>
+
+  <view class="qr-card">
+    <text class="qr-title">我的出行码</text>
+    <text class="qr-subtitle">请向门岗出示此码</text>
+    <view class="qr-box">
+      <image class="qr-code" src="{{qrCode}}" mode="aspectFit" wx:if="{{qrCode}}"></image>
+      <view class="loading-qr" wx:else>二维码生成中...</view>
+    </view>
+    <text class="refresh-tip" bindtap="refreshCode">每30秒自动刷新 · 点击立即刷新</text>
+
+    <view class="info">
+      <view class="row">
+        <text class="label">有效时间</text>
+        <text class="value">{{expireTimeStr}}</text>
+      </view>
+      <view class="row">
+        <text class="label">车辆信息</text>
+        <text class="value">{{user.vehicleInfo || '无车辆'}}</text>
+      </view>
+    </view>
+  </view>
+  
+  <view class="action-bar">
+    <button class="btn-share" open-type="share">分享给好友</button>
+    <button class="btn-history" bindtap="goToHistory">申请记录</button>
+    <button class="btn-apply" bindtap="showApplyModal">重新申请</button>
+  </view>
+
+  <!-- Apply Modal -->
+  <view class="modal-mask" wx:if="{{showModal}}" bindtap="hideModal">
+    <view class="modal-content" catchtap="preventBubble">
+      <view class="modal-title">申请出行码</view>
+      <view class="modal-form">
+        <view class="form-item">
+          <text class="form-label">车牌号 (选填)</text>
+          <input class="modal-input" placeholder="请输入车牌号" model:value="{{inputPlate}}" />
+        </view>
+      </view>
+      <view class="modal-footer">
+        <button class="btn-cancel-modal" bindtap="hideModal">取消</button>
+        <button class="btn-confirm-modal" bindtap="submitApply">确认申请</button>
+      </view>
+    </view>
+  </view>
+</view>

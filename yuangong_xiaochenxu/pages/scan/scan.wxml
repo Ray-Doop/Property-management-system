@@ -1,0 +1,37 @@
+<view class="container">
+  <view class="hero">
+    <text class="hero-title">出行码核销</text>
+    <text class="hero-subtitle">扫码或输入记录ID进行校验</text>
+  </view>
+
+  <view class="card form-card">
+    <view class="input-row">
+      <input class="input" placeholder="请输入记录ID" value="{{code}}" bindinput="handleInput" />
+      <button class="btn btn-outline" bindtap="handleScan">扫码</button>
+    </view>
+    <view class="btn-row">
+      <button class="btn btn-primary" bindtap="handleVerify" loading="{{loading}}">立即核验</button>
+    </view>
+  </view>
+
+  <view class="result-card" wx:if="{{result}}">
+    <view class="result-header">
+      <text class="result-title">{{result.valid ? '核验通过' : '核验失败'}}</text>
+      <text class="result-status {{result.valid ? 'success' : 'error'}}">{{result.message || result.error}}</text>
+    </view>
+    <view class="result-body" wx:if="{{result.data}}">
+      <view class="row">
+        <text class="label">记录ID</text>
+        <text class="value">{{result.data.id}}</text>
+      </view>
+      <view class="row">
+        <text class="label">状态</text>
+        <text class="value">{{result.data.status}}</text>
+      </view>
+      <view class="row" wx:if="{{result.data.fee >= 0}}">
+        <text class="label">停车费</text>
+        <text class="value">¥{{result.data.fee || 0}}</text>
+      </view>
+    </view>
+  </view>
+</view>

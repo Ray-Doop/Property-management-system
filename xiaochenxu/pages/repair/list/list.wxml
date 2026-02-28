@@ -1,0 +1,29 @@
+<view class="container">
+  <view class="header-action">
+    <button class="btn-submit" bindtap="goToSubmit">
+      <text class="iconfont">➕</text> 新增报修
+    </button>
+  </view>
+
+  <block wx:if="{{list.length > 0}}">
+    <view class="repair-item" wx:for="{{list}}" wx:key="orderId" bindtap="goToDetail" data-id="{{item.orderId}}">
+      <view class="item-header">
+        <text class="category">{{item.categoryName || '维修'}}</text>
+        <view class="status {{item.status == '待处理' ? 'status-pending' : (item.status == '已完成' ? 'status-done' : 'status-processing')}}">
+          {{item.status}}
+        </view>
+      </view>
+      <view class="item-content">{{item.description}}</view>
+      <view class="item-footer">
+        <text class="time">{{item.createdTime}}</text>
+        <text class="arrow">></text>
+      </view>
+    </view>
+    <view class="loading" wx:if="{{loading}}">加载中...</view>
+    <view class="no-more" wx:if="{{!hasMore && !loading}}">没有更多了</view>
+  </block>
+  <view class="empty" wx:else>
+    <image src="/assets/qr-placeholder.png" mode="aspectFit"></image>
+    <text>暂无报修记录</text>
+  </view>
+</view>

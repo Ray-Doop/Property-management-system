@@ -1,0 +1,83 @@
+<view class="container">
+  <view class="sticky-header">
+    <view class="header-bg"></view> <!-- 渐变背景层 -->
+    
+    <view class="page-title-area">
+      <view class="title-main">
+        <text class="title-text">工单中心</text>
+        <text class="subtitle-text">今日共 {{list.length || 0}} 个任务</text>
+      </view>
+      <!-- 右侧可能放个日历图标或者刷新按钮 -->
+    </view>
+    
+    <!-- 数据概览卡片 (悬浮在Header上) -->
+    <view class="stats-card">
+      <view class="stat-item" bindtap="switchTab" data-status="待处理">
+        <text class="stat-num {{status === '待处理' ? 'active-num' : ''}}">{{stats.pending || 0}}</text>
+        <text class="stat-label {{status === '待处理' ? 'active-label' : ''}}">待处理</text>
+        <view class="stat-indicator" wx:if="{{status === '待处理'}}"></view>
+      </view>
+      <view class="stat-divider"></view>
+      <view class="stat-item" bindtap="switchTab" data-status="维修中">
+        <text class="stat-num {{status === '维修中' ? 'active-num' : ''}}">{{stats.processing || 0}}</text>
+        <text class="stat-label {{status === '维修中' ? 'active-label' : ''}}">维修中</text>
+        <view class="stat-indicator" wx:if="{{status === '维修中'}}"></view>
+      </view>
+      <view class="stat-divider"></view>
+      <view class="stat-item" bindtap="switchTab" data-status="已完成">
+        <text class="stat-num {{status === '已完成' ? 'active-num' : ''}}">{{stats.completed || 0}}</text>
+        <text class="stat-label {{status === '已完成' ? 'active-label' : ''}}">已完成</text>
+        <view class="stat-indicator" wx:if="{{status === '已完成'}}"></view>
+      </view>
+    </view>
+  </view>
+
+  <scroll-view scroll-y class="list-container" refresher-enabled bindrefresherrefresh="onRefresh" refresher-triggered="{{isRefreshing}}">
+    <block wx:if="{{list.length > 0}}">
+      <view class="order-card" wx:for="{{list}}" wx:key="orderId" bindtap="goToDetail" data-id="{{item.orderId}}" data-status="{{item.status}}">
+        <!-- 装饰性背景圆 -->
+        <view class="card-decoration"></view>
+        
+        <view class="card-header">
+          <view class="header-left">
+            <view class="priority-badge {{item.priority === 'urgent' || item.priority === '紧急' ? 'urgent' : 'normal'}}">
+              <text class="badge-dot"></text>
+              <text>{{(item.priority === 'urgent' || item.priority === '紧急') ? '紧急' : '普通'}}</text>
+            </view>
+            <text class="order-id">#{{item.orderId}}</text>
+          </view>
+          <text class="order-time">{{item.createdTime}}</text>
+        </view>
+        
+        <view class="card-body">
+          <view class="main-info">
+            <text class="category-name">{{item.categoryName || '维修申报'}}</text>
+            <text class="desc-text">{{item.description}}</text>
+          </view>
+          <view class="status-icon-wrapper">
+            <!-- 根据状态显示不同图标/颜色 -->
+            <view class="status-ring {{item.status === '待处理' ? 'pending' : (item.status === '维修中' ? 'processing' : 'completed')}}">
+              <text class="status-text">{{item.status}}</text>
+            </view>
+          </view>
+        </view>
+
+        <view class="card-footer">
+          <view class="location-info" wx:if="{{item.buildingNo}}">
+            <text class="icon-loc">📍</text>
+            <text>{{item.buildingNo}}栋 {{item.unitNo}}单元 {{item.roomNo}}</text>
+          </view>
+          <view class="action-btn">处理</view>
+        </view>
+      </view>
+      <view class="bottom-spacer"></view>
+    </block>
+    
+    <view class="empty-state" wx:else>
+      <image class="empty-img" src="/assets/empty.png" mode="widthFix" wx:if="{{false}}"></image>
+      <view class="empty-icon">📂</view>
+      <text class="empty-text">暂无工单</text>
+      <text class="empty-sub">当前状态下没有需要处理的任务</text>
+    </view>
+  </scroll-view>
+</view>

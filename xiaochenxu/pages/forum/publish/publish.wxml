@@ -1,0 +1,53 @@
+<view class="container publish-page">
+  <view class="page-card">
+    <view class="field-block">
+      <view class="field-label">
+        <text class="field-title">板块</text>
+      </view>
+      <picker bindchange="bindSectionChange" value="{{sectionIndex}}" range="{{sections}}" range-key="sectionName">
+        <view class="picker-value">{{sectionIndex !== null ? sections[sectionIndex].sectionName : '请选择板块'}}</view>
+      </picker>
+    </view>
+    <view class="field-block">
+      <view class="field-label">
+        <text class="field-title">标题</text>
+        <text class="field-count">{{titleLen}}</text>
+      </view>
+      <input class="title-input" placeholder="给帖子起个标题" value="{{title}}" bindinput="bindTitleInput" maxlength="50" />
+    </view>
+
+    <view class="field-block">
+      <view class="field-label">
+        <text class="field-title">内容</text>
+        <text class="field-count">{{contentLen}}/{{maxContent}}</text>
+      </view>
+      <textarea class="content-input" placeholder="分享新鲜事，让邻里看到你的动态..." value="{{content}}" bindinput="bindContentInput" maxlength="{{maxContent}}" />
+    </view>
+  </view>
+
+  <view class="page-card">
+    <view class="field-label">
+      <text class="field-title">图片</text>
+      <text class="field-count">{{images.length}}/9</text>
+    </view>
+    <view class="image-list">
+      <view class="image-item" wx:for="{{images}}" wx:key="*this">
+        <image src="{{item}}" mode="aspectFill"></image>
+        <view class="delete-btn" bindtap="deleteImage" data-index="{{index}}">×</view>
+      </view>
+      <view class="upload-btn" bindtap="chooseImage" wx:if="{{images.length < 9}}">
+        <text class="upload-icon">+</text>
+        <text class="upload-text">添加图片</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="page-tips">
+    <view class="tip-item">文明发帖，真实分享更受欢迎</view>
+    <view class="tip-item">清晰图片有助于提高互动</view>
+  </view>
+
+  <view class="publish-bar">
+    <button class="btn-publish {{canPublish ? 'active' : 'disabled'}}" bindtap="publish" disabled="{{!canPublish}}">发布</button>
+  </view>
+</view>

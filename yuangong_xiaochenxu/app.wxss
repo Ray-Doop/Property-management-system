@@ -1,0 +1,32 @@
+.page {
+  background: var(--page-bg);
+  color: var(--text-primary);
+}
+
+page {
+  background: var(--page-bg);
+  color: var(--text-primary);
+  font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+:root {
+  --primary: #3c7fff;
+  --primary-light: #eaf0ff;
+  --page-bg: #f6f7fb;
+  --card-bg: #ffffff;
+  --input-bg: #f3f4f6;
+  --text-primary: #1f2937;
+  --text-secondary: #6b7280;
+  --line-color: #e5e7eb;
+  --card-shadow: 0 12rpx 28rpx rgba(15, 23, 42, 0.08);
+}
+
+button::after {
+  border: none;
+}
+
+.card {
+  background: var(--card-bg);
+  border-radius: 20rpx;
+  box-shadow: var(--card-shadow);
+}

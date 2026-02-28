@@ -1,0 +1,36 @@
+<view class="container">
+  <view class="hero">
+    <view class="hero-top">
+      <view class="app-title">工作台</view>
+      <view class="app-subtitle">Employee Center</view>
+    </view>
+    <view class="hero-card" bindtap="goToProfile">
+      <view class="avatar-box">
+        <view class="avatar">{{employee.name[0]}}</view>
+        <view class="status-badge">在线</view>
+      </view>
+      <view class="info">
+        <view class="name-row">
+          <text class="name">{{employee.name || '员工'}}</text>
+          <text class="tag">正式员工</text>
+        </view>
+        <text class="role">工号：{{employee.no || employee.username}}</text>
+      </view>
+      <view class="hero-actions" bindtap="handleLogout" catchtap="true">
+        <text class="action-text">退出</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="content">
+    <view class="section-title">功能入口</view>
+    <view class="menu-grid">
+      <view class="menu-item" wx:for="{{menuList}}" wx:key="id" bindtap="handleMenuClick" data-id="{{item.id}}" hover-class="menu-hover">
+        <view class="icon-box" style="background: {{item.color}}18; color: {{item.color}}">
+          <text class="icon-text">{{item.name[0]}}</text>
+        </view>
+        <text class="menu-name">{{item.name}}</text>
+      </view>
+    </view>
+  </view>
+</view>

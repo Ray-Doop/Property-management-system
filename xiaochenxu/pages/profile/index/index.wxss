@@ -1,0 +1,101 @@
+.profile-container {
+  padding: 30rpx;
+  background: var(--bg-color);
+  min-height: 100vh;
+}
+
+.header-card {
+  background: var(--card-bg);
+  border-radius: 32rpx;
+  padding: 40rpx;
+  display: flex;
+  align-items: center;
+  margin-bottom: 30rpx;
+  box-shadow: var(--card-shadow);
+}
+
+.avatar {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 50%;
+  margin-right: 30rpx;
+  background-color: #f3f4f6;
+  border: 2rpx solid var(--border-color);
+}
+
+.info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.nickname {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: var(--text-main);
+  margin-bottom: 10rpx;
+}
+
+.uid {
+  font-size: 26rpx;
+  color: var(--text-secondary);
+}
+
+.arrow {
+  font-size: 32rpx;
+  color: var(--text-secondary);
+}
+
+.menu-list {
+  background: var(--card-bg);
+  border-radius: 24rpx;
+  padding: 0 20rpx;
+  box-shadow: var(--card-shadow);
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 30rpx 10rpx;
+  border-bottom: 1rpx solid var(--border-color);
+}
+
+.menu-item:last-child {
+  border-bottom: none;
+}
+
+.item-left {
+  display: flex;
+  align-items: center;
+}
+
+.icon-box {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 24rpx;
+}
+
+.icon-box .iconfont {
+  font-size: 36rpx;
+}
+
+.menu-text {
+  font-size: 30rpx;
+  color: var(--text-main);
+}
+
+.bg-blue { background-color: var(--primary-light); color: var(--primary-color); }
+.bg-green { background-color: #f6ffed; color: #52c41a; }
+.bg-red { background-color: #fff1f0; color: #f5222d; }
+
+.footer-version {
+  text-align: center;
+  color: var(--text-placeholder);
+  font-size: 24rpx;
+  margin-top: 60rpx;
+}

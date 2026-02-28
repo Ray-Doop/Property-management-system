@@ -1,0 +1,21 @@
+<view class="container" wx:if="{{notice}}">
+  <view class="header">
+    <text class="title">{{notice.title}}</text>
+    <view class="meta">
+      <text class="publisher">{{notice.publisherName}}</text>
+      <text class="time">{{notice.publishTime}}</text>
+    </view>
+  </view>
+
+  <view class="content">
+    <text>{{notice.content}}</text>
+  </view>
+
+  <view class="attachments" wx:if="{{notice.attachments && notice.attachments.length > 0}}">
+    <view class="section-title">附件</view>
+    <view class="file-item" wx:for="{{notice.attachments}}" wx:key="attachmentId" bindtap="previewFile" data-url="{{item.fileUrl}}" data-type="{{item.fileType}}">
+      <text class="iconfont">📎</text>
+      <text class="filename">附件 {{index + 1}}</text>
+    </view>
+  </view>
+</view>

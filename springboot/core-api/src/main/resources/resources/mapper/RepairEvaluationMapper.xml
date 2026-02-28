@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.modules.business.repair.mapper.RepairEvaluationMapper">
+    <resultMap id="BaseMap" type="com.example.entity.repair.RepairEvaluation">
+        <id property="evalId" column="eval_id"/>
+        <result property="assignmentId" column="assignment_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="evalTime" column="eval_time"/>
+        <result property="score" column="score"/>
+        <result property="content" column="content"/>
+        <result property="isAnonymous" column="is_anonymous"/>
+        <result property="replyContent" column="reply_content"/>
+        <result property="replyTime" column="reply_time"/>
+        <result property="avatarUrl" column="avatar_url"/>
+        <result property="nickname" column="nickname"/>
+    </resultMap>
+    <select id="selectPage" resultMap="BaseMap">
+        SELECT re.*, u.avatar_url, u.nickname
+        FROM repair_evaluation re
+        LEFT JOIN user u ON re.user_id = u.user_id
+        <where>
+            <if test="score != null">AND re.score = #{score}</if>
+            <if test="assignmentId != null">AND re.assignment_id = #{assignmentId}</if>
+        </where>
+        ORDER BY re.eval_time DESC
+    </select>
+    <update id="updateReply">
+        UPDATE repair_evaluation
+        SET reply_content = #{replyContent}, reply_time = NOW()
+        WHERE eval_id = #{evalId}
+    </update>
+</mapper>

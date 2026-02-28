@@ -1,0 +1,50 @@
+.container {
+  background-color: var(--bg-color);
+  min-height: 100vh;
+  padding-top: 20rpx;
+}
+
+.form-group {
+  background: var(--card-bg);
+  padding: 30rpx;
+  display: flex;
+  align-items: center;
+  border-bottom: 1rpx solid var(--border-color);
+}
+
+.avatar-group {
+  justify-content: space-between;
+  padding: 20rpx 30rpx;
+}
+
+.label {
+  width: 160rpx;
+  font-size: 30rpx;
+  color: var(--text-main);
+}
+
+.input {
+  flex: 1;
+  font-size: 30rpx;
+  color: var(--text-main);
+}
+
+.avatar {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 50%;
+}
+
+.arrow {
+  color: var(--text-secondary);
+  margin-left: 20rpx;
+}
+
+.btn-save {
+  margin: 60rpx 30rpx;
+  background-color: var(--primary-color);
+  color: #fff;
+  border-radius: 40rpx;
+  font-size: 32rpx;
+  box-shadow: 0 12rpx 24rpx rgba(60, 127, 255, 0.28);
+}

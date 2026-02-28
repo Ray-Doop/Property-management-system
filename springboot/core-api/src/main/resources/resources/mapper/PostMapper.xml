@@ -1,0 +1,429 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.modules.business.forum.mapper.PostMapper">
+
+    <!-- 评论结果映射 -->
+    <resultMap id="commentMap" type="com.example.entity.Forum.ForumComment">
+        <id column="comment_id" property="commentId"/>
+        <result column="post_id" property="postId"/>
+        <result column="content" property="content"/>
+        <result column="user_id" property="userId"/>
+        <result column="parent_id" property="parentId"/>
+        <result column="status" property="status"/>
+        <result column="like_count" property="likeCount"/>
+        <result column="created_time" property="createdTime"/>
+        <result column="updated_time" property="updatedTime"/>
+        <!-- 评论关联的用户信息 -->
+        <result column="comment_nickname" property="nickname"/>
+        <result column="comment_avatar_url" property="avatarUrl"/>
+        <result column="comment_username" property="username"/>
+        <!-- 评论图片附件 -->
+        <collection property="attachments" ofType="com.example.entity.Forum.ForumAttachment"
+                    column="comment_id" select="selectCommentAttachments"/>
+        <!-- 子评论集合 -->
+        <collection property="replies"
+                    ofType="com.example.entity.Forum.ForumComment"
+                    column="comment_id"
+                    select="selectReplies"/>
+    </resultMap>
+
+    <!-- 帖子结果映射（包含附件和评论） -->
+    <resultMap id="postWithAttachmentsMap" type="com.example.entity.Forum.ForumPost">
+        <id column="post_id" property="postId"/>
+        <result column="section_id" property="sectionId"/>
+        <result column="title" property="title"/>
+        <result column="content" property="content"/>
+        <result column="user_id" property="userId"/>
+        <result column="is_top" property="isTop"/>
+        <result column="is_essence" property="isEssence"/>
+        <result column="status" property="status"/>
+        <result column="collect_count" property="collectCount"/>
+        <result column="comment_count" property="commentCount"/>
+        <result column="created_time" property="createdTime"/>
+        <result column="updated_time" property="updatedTime"/>
+        <result column="last_comment_time" property="lastCommentTime"/>
+        <result column="nickname" property="nickname"/>
+        <result column="avatar_url" property="avatarUrl"/>
+        <result column="user_username" property="username"/>
+        
+        <!-- 附件列表 -->
+        <collection property="attachments" ofType="com.example.entity.Forum.ForumAttachment"
+                    column="post_id">
+            <id column="attachment_id" property="attachmentId"/>
+            <result column="post_id" property="postId"/>
+            <result column="file_path" property="filePath"/>
+            <result column="file_path" property="url"/> <!-- Map filePath to url as well -->
+            <result column="user_id" property="userId"/>
+        </collection>
+
+        <!-- 评论列表 -->
+        <collection property="comments" ofType="com.example.entity.Forum.ForumComment"
+                    column="post_id" select="selectComments"/>
+    </resultMap>
+
+    <!-- 根据用户ID和帖子ID删除论坛收藏表中的对应记录 -->
+    <delete id="delCancelCollect">
+        DELETE FROM forum_collect
+        WHERE user_id = #{userId} AND post_id = #{postId}
+    </delete>
+
+   <!--删除我的帖子-->
+    <delete id="delMyPost">
+        DELETE FROM forum_post
+        WHERE post_id = #{postId}
+    </delete>
+    <!-- 删除评论 -->
+    <update id="delMyPostComment">
+        UPDATE forum_comment
+        SET status = 0,
+            content = '该评论已删除',
+            updated_time = NOW()
+        WHERE comment_id = #{commentId}
+    </update>
+    
+    <!-- 追评计数缓存：插入或更新为当前有效子评论数量 -->
+    <insert id="upsertReplyCountCache">
+        INSERT INTO reply_count_cache (comment_id, reply_count)
+        VALUES (
+            #{commentId},
+            (SELECT COUNT(*) FROM forum_comment WHERE parent_id = #{commentId} AND status = 1)
+        )
+        ON DUPLICATE KEY UPDATE reply_count = VALUES(reply_count)
+    </insert>
+
+    <!--同步板块名-->
+    <update id="updatePostWithSectionName">
+        UPDATE forum_post p
+            JOIN forum_section s ON p.section_id = s.section_id
+            SET p.section_name = s.section_name
+
+    </update>
+
+    <select id="selectSections" resultType="com.example.entity.Forum.ForumSection">
+        SELECT section_id, section_name, section_desc, sort_order, status, created_by, created_time, updated_time
+        FROM forum_section
+        ORDER BY sort_order ASC, section_id ASC
+    </select>
+
+
+    <!-- 查询所有帖子 -->
+    <select id="selectPostAll" resultType="com.example.entity.Forum.ForumPost">
+        SELECT p.post_id, p.section_id, p.title, p.content, p.user_id, p.is_top, p.is_essence, p.status,
+               p.collect_count, p.comment_count, p.created_time, p.updated_time, p.last_comment_time,
+               u.nickname, u.avatar_url AS avatarUrl, u.username AS username
+        FROM forum_post p
+        LEFT JOIN user u ON p.user_id = u.user_id
+        ORDER BY
+            CASE
+                WHEN p.is_top = 1 THEN 1
+                ELSE 2
+                END,
+            p.created_time DESC   -- 再按创建时间倒序
+    </select>
+
+    <!-- 查询用户收藏的帖子 -->
+    <select id="selectPageCollect" parameterType="com.example.entity.Forum.ForumPost" resultType="com.example.entity.Forum.ForumPost">
+        SELECT
+            fp.post_id,
+            fp.section_id,
+            fp.title,
+            fp.content,
+            fp.user_id,
+            fp.is_top,
+            fp.is_essence,
+            fp.status,
+            fp.comment_count,
+            fp.collect_count,
+            fp.created_time,
+            fp.updated_time,
+            fp.last_comment_time
+        FROM forum_post fp
+                 INNER JOIN forum_collect fc
+                            ON fp.post_id = fc.post_id
+        WHERE fc.user_id = #{userId}
+    </select>
+
+    <!-- 按评论数排序查询所有帖子 -->
+    <select id="selectPageHot" resultType="com.example.entity.Forum.ForumPost">
+        SELECT
+            fp.post_id,
+            fp.section_id,
+            fp.title,
+            fp.content,
+            fp.user_id,
+            fp.is_top,
+            fp.is_essence,
+            fp.status,
+            fp.collect_count,
+            IFNULL(fc.comment_count, 0) AS comment_count,
+            fp.created_time,
+            fp.updated_time,
+            fp.last_comment_time
+        FROM forum_post fp
+                 LEFT JOIN (
+            SELECT post_id, COUNT(*) AS comment_count
+            FROM forum_comment
+            GROUP BY post_id
+        ) fc ON fp.post_id = fc.post_id
+        ORDER BY IFNULL(fc.comment_count, 0) DESC, fp.created_time DESC
+    </select>
+
+    <!-- 更新 forum_post.collect_count -->
+    <update id="updatePostCollectCount">
+        UPDATE forum_post fp
+            LEFT JOIN (
+            SELECT post_id, COUNT(*) AS collect_count
+            FROM forum_collect
+            GROUP BY post_id
+            ) fc ON fp.post_id = fc.post_id
+            SET fp.collect_count = IFNULL(fc.collect_count, 0)
+    </update>
+
+    <!-- 查询按收藏数排序的帖子 -->
+    <select id="selectPageHotByCollect" resultType="com.example.entity.Forum.ForumPost">
+        SELECT
+            fp.post_id,
+            fp.section_id,
+            fp.title,
+            fp.content,
+            fp.user_id,
+            fp.is_top,
+            fp.is_essence,
+            fp.status,
+            fp.collect_count,
+            IFNULL(fc.comment_count, 0) AS comment_count,
+            fp.created_time,
+            fp.updated_time,
+            fp.last_comment_time
+        FROM forum_post fp
+                 LEFT JOIN (
+            SELECT post_id, COUNT(*) AS comment_count
+            FROM forum_comment
+            GROUP BY post_id
+        ) fc ON fp.post_id = fc.post_id
+        ORDER BY fp.collect_count DESC, fp.created_time DESC
+    </select>
+
+    <!-- 新增帖子 -->
+    <insert id="addPost" parameterType="com.example.entity.Forum.ForumPost" useGeneratedKeys="true" keyProperty="postId">
+        INSERT INTO forum_post (title, content, section_id, user_id, created_time,nickname)
+        VALUES (#{title}, #{content}, #{sectionId}, #{userId}, NOW(),#{nickname})
+    </insert>
+
+    <!-- 批量插入附件 -->
+    <insert id="batchInsertAttachments">
+        INSERT INTO forum_attachment (post_id, file_path, user_id)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.postId}, #{item.url}, #{item.userId})
+        </foreach>
+    </insert>
+
+    <!-- 查询帖子详情 -->
+    <select id="postDetail" resultMap="postWithAttachmentsMap">
+        SELECT p.post_id, p.section_id, p.title, p.content, p.user_id, p.is_top, p.is_essence, p.status,
+               p.collect_count, p.comment_count, p.created_time, p.updated_time, p.last_comment_time,
+               u.nickname, u.avatar_url, u.username AS user_username,
+               a.attachment_id, a.file_path
+        FROM forum_post p
+                 LEFT JOIN user u ON p.user_id = u.user_id
+                 LEFT JOIN forum_attachment a ON p.post_id = a.post_id
+        WHERE p.post_id = #{postId}
+        ORDER BY a.attachment_id ASC
+    </select>
+
+    <!-- 查询一级评论 -->
+    <select id="selectComments" resultMap="commentMap">
+        SELECT c.comment_id, c.post_id, c.content, c.user_id, c.parent_id, c.status,
+               c.like_count, c.created_time, c.updated_time,
+               u.nickname AS comment_nickname,
+               u.avatar_url AS comment_avatar_url,
+               u.username AS comment_username
+        FROM forum_comment c
+                 LEFT JOIN `user` u ON c.user_id = u.user_id
+        WHERE c.post_id = #{postId}
+          AND (c.status = 1 OR c.status = 0)
+          AND (c.parent_id IS NULL OR c.parent_id = 0)
+        ORDER BY c.created_time DESC
+    </select>
+
+    <!-- 查询子评论 -->
+    <select id="selectReplies" resultMap="commentMap">
+        SELECT c.comment_id, c.post_id, c.content, c.user_id, c.parent_id, c.status,
+               c.like_count, c.created_time, c.updated_time,
+               u.nickname AS comment_nickname,
+               u.avatar_url AS comment_avatar_url,
+               u.username AS comment_username
+        FROM forum_comment c
+                 LEFT JOIN `user` u ON c.user_id = u.user_id
+        WHERE c.parent_id = #{commentId}
+          AND c.status = 1
+        ORDER BY c.created_time ASC
+    </select>
+    
+    <!-- 根据ID查询评论 -->
+    <select id="selectCommentById" resultType="com.example.entity.Forum.ForumComment">
+        SELECT comment_id, post_id, parent_id, like_count
+        FROM forum_comment
+        WHERE comment_id = #{commentId}
+    </select>
+    
+    <!-- 查询评论附件（图片） -->
+    <select id="selectCommentAttachments" resultType="com.example.entity.Forum.ForumAttachment">
+        SELECT attachment_id, comment_id, file_path, file_path AS url, user_id
+        FROM forum_attachment
+        WHERE comment_id = #{commentId}
+        ORDER BY attachment_id ASC
+    </select>
+
+    <select id="SelectByTitle" resultType="com.example.entity.Forum.ForumPost">
+        SELECT p.post_id, p.section_id, p.title, p.content, p.user_id, p.is_top, p.is_essence, p.status,
+               p.collect_count, p.comment_count, p.created_time, p.updated_time, p.last_comment_time,
+               u.nickname, u.avatar_url AS avatarUrl, u.username AS username
+        FROM forum_post p
+                 LEFT JOIN user u ON p.user_id = u.user_id
+        <where>
+            <if test="title != null and title != ''">
+                AND p.title LIKE concat('%', #{title}, '%')
+            </if>
+        </where>
+        ORDER BY p.created_time DESC
+    </select>
+    <select id="showMyPost" resultType="com.example.entity.Forum.ForumPost">
+        SELECT p.post_id, p.section_id, p.title, p.content, p.user_id, p.is_top, p.is_essence, p.status,
+               p.collect_count, p.comment_count, p.created_time, p.updated_time, p.last_comment_time,
+               u.nickname, u.avatar_url AS avatarUrl, u.username AS username
+        FROM forum_post p
+                 LEFT JOIN user u ON p.user_id = u.user_id
+        WHERE p.user_id = #{userId}
+        ORDER BY p.created_time DESC
+    </select>
+    <select id="SwitchSectione" resultType="com.example.entity.Forum.ForumPost">
+        SELECT p.post_id, p.section_id, p.title, p.content, p.user_id, p.is_top, p.is_essence, p.status,
+               p.collect_count, p.comment_count, p.created_time, p.updated_time, p.last_comment_time,
+               u.nickname, u.avatar_url AS avatarUrl, u.username AS username
+        FROM forum_post p
+                 LEFT JOIN user u ON p.user_id = u.user_id
+        <where>
+            p.section_id = #{sectionId}
+        </where>
+        ORDER BY p.created_time DESC
+    </select>
+    <!-- 查看是否收藏-->
+    <select id="existsByPostIdAndUserId" resultType="int">
+        SELECT COUNT(*)
+        FROM forum_collect
+        WHERE post_id = #{postId} AND user_id = #{userId}
+    </select>
+
+    <!-- 我的评论 -->
+    <resultMap id="CommentWithPostResultMap" type="com.example.entity.Forum.CommentWithPostDTO">
+        <!-- 评论字段映射 -->
+        <id property="commentId" column="comment_id"/>
+        <result property="postId" column="post_id"/>
+        <result property="content" column="content"/>
+        <result property="userId" column="user_id"/>
+        <result property="createdTime" column="created_time"/>
+        <result property="avatarUrl" column="avatar_url"/>
+        <!-- 其他评论字段 -->
+
+        <!-- 文章字段映射 -->
+        <result property="postTitle" column="post_title"/>
+        <result property="postContent" column="post_content"/>
+        <result property="postCreatedTime" column="post_created_time"/>
+    </resultMap>
+
+    <select id="SelectMyPostCommentt" resultMap="CommentWithPostResultMap">
+        SELECT
+            fc.comment_id,
+            fc.post_id,
+            fc.content,
+            fc.user_id,
+            fc.created_time,
+            fp.title AS post_title,
+            fp.content AS post_content,
+            fp.created_time AS post_created_time,
+            u.avatar_url
+        FROM forum_comment fc
+                 JOIN forum_post fp ON fc.post_id = fp.post_id
+                 LEFT JOIN user u ON fc.user_id = u.user_id
+        WHERE fc.user_id = #{userId}
+    </select>
+
+    <select id="SelectAllComment" resultMap="CommentWithPostResultMap">
+        SELECT
+            fc.comment_id,
+            fc.post_id,
+            fc.content,
+            fc.user_id,
+            fc.created_time,
+            fp.title AS post_title,
+            fp.content AS post_content,
+            fp.created_time AS post_created_time,
+            u.avatar_url
+        FROM forum_comment fc
+                 JOIN forum_post fp ON fc.post_id = fp.post_id
+                 LEFT JOIN user u ON fc.user_id = u.user_id
+    </select>
+
+    <!-- 同步评论数 -->
+    <update id="synchronous">
+        UPDATE forum_post p
+        SET p.comment_count = (
+            SELECT COALESCE(COUNT(*), 0)
+            FROM forum_comment c
+            WHERE c.post_id = p.post_id
+        );
+    </update>
+
+    <update id="top">
+        UPDATE forum_post
+        SET is_top = 1
+        WHERE post_id = #{postId}
+    </update>
+
+    <update id="exquisite">
+        UPDATE forum_post
+        SET is_essence = 1
+        WHERE post_id = #{postId}
+    </update>
+
+    <update id="cancelTop">
+        UPDATE forum_post
+        SET is_top = 0
+        WHERE post_id = #{postId}
+    </update>
+
+    <update id="cancelExquisite">
+        UPDATE forum_post
+        SET is_essence = 0
+        WHERE post_id = #{postId}
+    </update>
+
+
+    <insert id="addPostComment" useGeneratedKeys="true" keyProperty="commentId">
+        INSERT INTO `forum_comment` (post_id,content,user_id,parent_id, status, created_time, updated_time)
+        VALUES (#{postId}, #{content}, #{userId}, #{parentId}, #{status}, NOW(), NOW())
+    </insert>
+    
+    <!-- 批量插入评论附件 -->
+    <insert id="batchInsertCommentAttachments">
+        INSERT INTO forum_attachment (comment_id, file_path, user_id)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.commentId}, #{item.url}, #{item.userId})
+        </foreach>
+    </insert>
+    
+    <!-- 点赞更新 -->
+    <update id="updateCommentLikeCount">
+        UPDATE forum_comment SET like_count = like_count + #{delta} WHERE comment_id = #{commentId}
+    </update>
+
+    <insert id="addToCollection">
+        INSERT INTO `forum_collect` (post_id,user_id)
+        VALUES (#{postId},  #{userId})
+    </insert>
+
+</mapper>

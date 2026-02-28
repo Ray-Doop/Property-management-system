@@ -1,0 +1,75 @@
+<view class="container" wx:if="{{order}}">
+  <view class="status-card">
+    <view class="status-text">{{order.status}}</view>
+    <view class="status-desc" wx:if="{{order.status == '待处理'}}">请等待物业人员接单</view>
+    <view class="status-desc" wx:if="{{order.status == '已完成'}}">维修已完成，感谢您的评价</view>
+  </view>
+
+  <view class="section">
+    <view class="item">
+      <text class="label">报修单号</text>
+      <text class="value">{{order.orderId}}</text>
+    </view>
+    <view class="item">
+      <text class="label">报修类别</text>
+      <text class="value">{{order.categoryName}}</text>
+    </view>
+    <view class="item">
+      <text class="label">报修时间</text>
+      <text class="value">{{order.createdTime}}</text>
+    </view>
+    <view class="item">
+      <text class="label">报修地址</text>
+      <text class="value">{{order.buildingNo}}栋{{order.unitNo}}单元{{order.roomNo}}室</text>
+    </view>
+    <view class="item">
+      <text class="label">联系电话</text>
+      <text class="value">{{order.phone}}</text>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="section-title">问题描述</view>
+    <view class="content">{{order.description}}</view>
+    <view class="image-list" wx:if="{{order.files && order.files.length > 0}}">
+      <view class="image-item" wx:for="{{order.files}}" wx:key="fileId">
+        <image wx:if="{{item.fileType !== 'video'}}" src="{{item.fileUrl}}" mode="aspectFill" bindtap="previewImage" data-src="{{item.fileUrl}}" class="repair-img"></image>
+        <view wx:if="{{item.fileType === 'video'}}" class="video-thumb" bindtap="previewVideo" data-src="{{item.fileUrl}}">
+          <text class="video-icon">▶</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="section" wx:if="{{order.status == '已完成'}}">
+    <view class="section-title">服务评价</view>
+    <block wx:if="{{order.evaluation}}">
+      <view class="item">
+        <text class="label">评分</text>
+        <text class="value">{{order.rating}}星</text>
+      </view>
+      <view class="content">{{order.evaluation}}</view>
+    </block>
+    <block wx:else>
+      <view class="rating-box">
+        <text class="label">评分</text>
+        <view class="stars">
+           <text wx:for="{{[1,2,3,4,5]}}" wx:key="*this" class="star {{rating >= item ? 'active' : ''}}" bindtap="setRating" data-score="{{item}}">★</text>
+        </view>
+      </view>
+      <textarea class="eval-input" placeholder="请输入评价内容" bindinput="bindEvalInput" />
+      <button class="btn-eval" bindtap="submitEvaluation">提交评价</button>
+    </block>
+  </view>
+
+  <view class="actions" wx:if="{{order.status == '待处理'}}">
+    <button class="btn-cancel" bindtap="cancelOrder">取消报修</button>
+  </view>
+</view>
+
+<view class="video-preview-mask" wx:if="{{videoPreviewVisible}}" bindtap="closeVideoPreview">
+  <view class="video-preview-card" catchtap="stopTap">
+    <view class="video-preview-close" catchtap="closeVideoPreview">×</view>
+    <video src="{{videoPreviewSrc}}" controls objectFit="contain" autoplay></video>
+  </view>
+</view>

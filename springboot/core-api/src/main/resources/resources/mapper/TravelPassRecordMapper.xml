@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.modules.business.travelpass.mapper.TravelPassRecordMapper">
+
+    <!-- 插入一条出行码记录 -->
+    <insert id="insert" parameterType="com.example.entity.TravelPassRecord" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO travel_pass_record
+        (user_id, username, has_vehicle, plate_number, paid, issue_time, expire_time, status)
+        VALUES
+            (#{userId}, #{username}, #{hasVehicle}, #{plateNumber}, #{paid}, #{issueTime}, #{expireTime}, #{status})
+    </insert>
+
+    <!-- 根据ID查询 -->
+    <select id="findById" resultType="com.example.entity.TravelPassRecord">
+        SELECT tpr.*, u.avatar_url as avatar 
+        FROM travel_pass_record tpr
+        LEFT JOIN user u ON tpr.user_id = u.user_id
+        WHERE tpr.id = #{id}
+    </select>
+
+    <!-- 更新入场状态 -->
+    <update id="updateStatusAndEntryTime">
+        UPDATE travel_pass_record
+        SET status = 'ENTERED',
+            entry_time = #{entryTime},
+            employee_id = #{employeeId}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 更新出场状态和费用 -->
+    <update id="updateExit">
+        UPDATE travel_pass_record
+        SET status = #{status},
+            exit_time = #{exitTime},
+            fee = #{fee},
+            employee_id = #{employeeId}
+        WHERE id = #{id}
+    </update>
+    
+    <select id="selectPage" resultType="com.example.entity.TravelPassRecord">
+        SELECT tpr.*, u.avatar_url as avatar, u.nickname
+        FROM travel_pass_record tpr
+        LEFT JOIN user u ON tpr.user_id = u.user_id
+        <where>
+            <if test="status != null and status != ''">AND tpr.status = #{status}</if>
+            <if test="username != null and username != ''">
+                AND (tpr.username LIKE concat('%', #{username}, '%') 
+                     OR u.nickname LIKE concat('%', #{username}, '%'))
+            </if>
+        </where>
+        ORDER BY tpr.issue_time DESC
+    </select>
+    
+    <select id="selectByUserId" resultType="com.example.entity.TravelPassRecord">
+        SELECT tpr.*, u.avatar_url as avatar, u.nickname
+        FROM travel_pass_record tpr
+        LEFT JOIN user u ON tpr.user_id = u.user_id
+        WHERE tpr.user_id = #{userId} 
+        ORDER BY tpr.issue_time DESC
+    </select>
+
+    <!-- 更新过期的出行码状态 -->
+    <update id="updateExpiredPasses">
+        UPDATE travel_pass_record
+        SET status = 'EXPIRED'
+        WHERE status = 'ISSUED' AND expire_time &lt; NOW()
+    </update>
+    
+    <!-- 标记单个记录为过期 -->
+    <update id="updateExpired">
+        UPDATE travel_pass_record
+        SET status = 'EXPIRED'
+        WHERE id = #{id} AND status = 'ISSUED'
+    </update>
+
+</mapper>

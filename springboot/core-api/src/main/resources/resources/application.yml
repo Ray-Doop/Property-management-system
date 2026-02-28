@@ -1,0 +1,50 @@
+redis:
+  host: localhost
+  port: 6379
+  #password: yourRedisPassword  # 如果有密码
+  timeout: 60000
+server:
+  port: 8080
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 200MB
+      enabled: true
+tomcat:
+  max-swallow-size: 200MB
+# 配置mybatis实体和xml映射
+mybatis:
+  ## 映射xml
+  mapper-locations: classpath:mapper/*.xml
+  configuration:
+    # 配置日志
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    map-underscore-to-camel-case: true
+alipay:
+  app-id: ${ALIPAY_APP_ID} # 支付宝应用 AppId
+  private-key: ${ALIPAY_PRIVATE_KEY} # 支付宝私钥（建议配置为环境变量）
+  alipay-public-key: ${ALIPAY_PUBLIC_KEY} # 支付宝公钥（建议配置为环境变量）
+  server-url: ${ALIPAY_SERVER_URL:https://openapi-sandbox.dl.alipaydev.com/gateway.do}
+  notify-url: ${ALIPAY_NOTIFY_URL} # 支付宝异步通知回调地址
+  return-url: ${ALIPAY_RETURN_URL} # 支付完成同步返回地址
+  sign-type: RSA2
+  charset: utf-8
+wechat:
+  appid: ${WECHAT_APPID} # 微信小程序 AppId
+  secret: ${WECHAT_SECRET} # 微信小程序 AppSecret
+jwt:
+  secret: ${JWT_SECRET} # JWT 签名密钥
+  expire: 86400000   # 1 天
+
+# 文件上传配置
+file:
+  upload-path: C:\uploads\avatar  # 本地文件上传路径
+  access-url: http://localhost:8080/files/download  # 文件访问URL前缀
+logging:
+  file:
+    name: logs/app.log
+  logback:
+    rollingpolicy:
+      max-file-size: 50MB
+      max-history: 30
+      total-size-cap: 2GB

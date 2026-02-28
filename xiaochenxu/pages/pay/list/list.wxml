@@ -1,0 +1,41 @@
+<view class="container">
+  <view class="header">
+    <text class="address">{{user.buildingNo}}栋{{user.unitNo}}单元{{user.roomNo}}室</text>
+  </view>
+
+  <view class="tabs">
+    <view class="tab {{currentTab == 1 ? 'active' : ''}}" bindtap="switchTab" data-tab="1">待支付</view>
+    <view class="tab {{currentTab == 2 ? 'active' : ''}}" bindtap="switchTab" data-tab="2">已支付</view>
+  </view>
+
+  <block wx:if="{{list.length > 0}}">
+    <view class="bill-item" wx:for="{{list}}" wx:key="id">
+      <view class="item-header">
+        <text class="title">{{item.title}}</text>
+        <text class="amount">¥{{item.amount}}</text>
+      </view>
+      <view class="item-content">
+        <view class="row">
+          <text class="label">账单周期</text>
+          <text class="value">{{item.periodStart}} 至 {{item.periodEnd}}</text>
+        </view>
+        <view class="row">
+          <text class="label">截止日期</text>
+          <text class="value">{{item.dueDate}}</text>
+        </view>
+      </view>
+      <view class="item-footer" wx:if="{{item.status == 1}}">
+        <button class="btn-pay" bindtap="payBill" data-id="{{item.id}}">立即支付</button>
+      </view>
+      <view class="item-footer" wx:else>
+        <text class="status-text">已支付</text>
+      </view>
+    </view>
+    <view class="loading" wx:if="{{loading}}">加载中...</view>
+    <view class="no-more" wx:if="{{!hasMore && !loading}}">没有更多了</view>
+  </block>
+  <view class="empty" wx:else>
+    <image src="/assets/qr-placeholder.png" mode="aspectFit"></image>
+    <text>暂无账单</text>
+  </view>
+</view>

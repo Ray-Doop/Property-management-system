@@ -1,0 +1,71 @@
+<view class="container">
+  <view class="form-group">
+    <view class="label">报修类别</view>
+    <picker bindchange="bindCategoryChange" value="{{categoryIndex}}" range="{{categories}}" range-key="categoryName">
+      <view class="picker">
+        {{categoryIndex !== null ? categories[categoryIndex].categoryName : '请选择类别'}}
+      </view>
+    </picker>
+  </view>
+
+  <view class="form-group">
+    <view class="label">详细描述</view>
+    <textarea class="textarea" placeholder="请详细描述您遇到的问题..." bindinput="bindDescriptionInput" value="{{description}}" />
+  </view>
+
+  <view class="form-group">
+    <view class="label">优先级</view>
+    <radio-group class="radio-group" bindchange="bindPriorityChange" value="{{priority}}">
+      <radio class="radio" value="normal">普通</radio>
+      <radio class="radio" value="urgent">紧急</radio>
+    </radio-group>
+  </view>
+
+  <view class="form-group">
+    <view class="label">预约上门时间</view>
+    <view class="date-time-row">
+      <picker mode="date" bindchange="bindDateChange" value="{{date}}" start="{{startDate}}" end="{{endDate}}">
+        <view class="picker date-time-item">
+          {{date || '请选择日期'}}
+        </view>
+      </picker>
+      <picker mode="time" bindchange="bindTimeChange" value="{{time}}">
+        <view class="picker date-time-item">
+          {{time || '请选择时间'}}
+        </view>
+      </picker>
+    </view>
+  </view>
+
+  <view class="form-group">
+    <view class="label">上传图片/视频</view>
+    <view class="image-list">
+      <view class="image-item" wx:for="{{files}}" wx:key="path">
+        <image wx:if="{{item.type !== 'video'}}" src="{{item.path}}" mode="aspectFill" bindtap="previewFile" data-src="{{item.path}}" data-type="{{item.type}}"></image>
+        <view wx:if="{{item.type === 'video'}}" class="video-thumb" bindtap="previewFile" data-src="{{item.path}}" data-type="{{item.type}}">
+          <text class="video-icon">▶</text>
+        </view>
+        <view class="delete-btn" catchtap="deleteFile" data-index="{{index}}">×</view>
+      </view>
+      <view class="upload-btn" bindtap="chooseMedia" wx:if="{{files.length < 3}}">
+        <text class="plus">+</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="section-title">联系信息</view>
+  
+  <view class="form-group">
+    <view class="label">联系电话</view>
+    <input class="input" type="number" placeholder="请输入联系电话" value="{{phone}}" bindinput="bindPhoneInput" />
+  </view>
+
+  <button class="btn-submit" bindtap="submit">提交报修</button>
+</view>
+
+<view class="video-preview-mask" wx:if="{{videoPreviewVisible}}" bindtap="closeVideoPreview">
+  <view class="video-preview-card" catchtap="stopTap">
+    <view class="video-preview-close" catchtap="closeVideoPreview">×</view>
+    <video src="{{videoPreviewSrc}}" controls objectFit="contain" autoplay></video>
+  </view>
+</view>

@@ -1,0 +1,135 @@
+<view class="container" wx:if="{{order}}">
+  <!-- 顶部状态 Banner (带背景色/渐变) -->
+  <view class="status-banner {{order.status === '待处理' ? 'bg-pending' : (order.status === '维修中' ? 'bg-processing' : 'bg-completed')}}">
+    <view class="banner-content">
+      <view class="status-icon-area">
+        <text class="status-icon-text" wx:if="{{order.status === '待处理'}}">⏳</text>
+        <text class="status-icon-text" wx:elif="{{order.status === '维修中'}}">🛠️</text>
+        <text class="status-icon-text" wx:else>✅</text>
+      </view>
+      <view class="status-text-area">
+        <text class="banner-status">{{order.status}}</text>
+        <text class="banner-desc" wx:if="{{order.status === '待处理'}}">业主正在等待，请尽快接单</text>
+        <text class="banner-desc" wx:if="{{order.status === '维修中'}}">维修进行中，记得拍照留证</text>
+        <text class="banner-desc" wx:if="{{order.status === '已完成'}}">任务圆满完成</text>
+      </view>
+    </view>
+    <view class="banner-wave"></view>
+  </view>
+
+  <view class="content-body">
+    <!-- 基础信息卡片 -->
+    <view class="card info-card">
+      <view class="card-header-row">
+        <view class="card-title">基本信息</view>
+        <view class="priority-tag {{order.priority === '紧急' || order.priority === 'urgent' ? 'tag-urgent' : 'tag-normal'}}">{{order.priority === 'urgent' ? '紧急' : (order.priority === 'normal' ? '普通' : (order.priority || '普通'))}}</view>
+      </view>
+      <view class="info-grid">
+        <view class="info-block">
+          <text class="label">工单编号</text>
+          <text class="value mono">{{order.orderId}}</text>
+        </view>
+        <view class="info-block">
+          <text class="label">提交时间</text>
+          <text class="value">{{order.createdTime}}</text>
+        </view>
+        <view class="info-block full-width">
+          <text class="label">报修类型</text>
+          <text class="value highlight">{{order.categoryName || '普通维修'}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 报修详情卡片 -->
+    <view class="card detail-card">
+      <view class="card-title">报修详情</view>
+      <view class="desc-box">
+        <text class="desc-text">{{order.description}}</text>
+      </view>
+      <!-- 如果有图片展示 -->
+      <view class="image-list" wx:if="{{order.images && order.images.length > 0}}">
+         <image class="detail-img" wx:for="{{order.images}}" wx:key="*this" src="{{item}}" mode="aspectFill"></image>
+      </view>
+    </view>
+
+    <!-- 联系人信息卡片 -->
+    <view class="card contact-card">
+      <view class="card-title">联系人信息</view>
+      <view class="contact-row">
+        <view class="contact-avatar-wrapper">
+          <view class="contact-avatar">{{order.name[0] || '业'}}</view>
+        </view>
+        <view class="contact-info">
+          <text class="contact-name">{{order.name || '未知业主'}}</text>
+          <view class="address-line">
+            <text class="icon-small">📍</text>
+            <text>{{order.address || (order.buildingNo + '栋' + order.unitNo + '单元' + order.roomNo + '室')}}</text>
+          </view>
+        </view>
+        <view class="call-btn-circle" bindtap="callUser" data-phone="{{order.phone}}" wx:if="{{order.phone}}">
+          <text class="phone-icon">📞</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 维修操作区 (维修中状态) -->
+    <view class="card action-card" wx:if="{{order.status === '维修中'}}">
+      <view class="card-title">维修凭证</view>
+      <view class="upload-area">
+        <view class="img-grid">
+          <view class="img-item" wx:for="{{images}}" wx:key="idx">
+            <image class="img" src="{{item}}" mode="aspectFill"></image>
+            <view class="remove" bindtap="removeImage" data-index="{{index}}">×</view>
+          </view>
+          <view class="img-add" bindtap="chooseImages" wx:if="{{images.length < 9}}">
+            <text class="add-icon">+</text>
+            <text class="add-text">上传照片</text>
+          </view>
+        </view>
+      </view>
+      <button class="full-width-btn primary-btn" bindtap="completeWithImages" loading="{{uploading}}">完成维修并提交</button>
+    </view>
+
+    <!-- 评价区域 (已完成状态) -->
+    <view class="card eval-card" wx:if="{{order.status === '已完成'}}">
+      <view class="card-title">服务评价</view>
+      <block wx:if="{{evaluation}}">
+        <view class="score-display">
+          <text class="score-big">{{evaluation.score}}</text>
+          <view class="stars-row">
+            <text class="star active" wx:for="{{evaluation.score}}" wx:key="*this">★</text>
+          </view>
+        </view>
+        <view class="eval-content-box">
+          <text class="quote-icon">“</text>
+          <text>{{evaluation.content}}</text>
+        </view>
+        
+        <!-- 回复区域 -->
+        <view class="reply-section" wx:if="{{evaluation.replyContent}}">
+          <view class="reply-header">
+            <text class="my-reply-label">我的回复</text>
+            <text class="reply-time">{{evaluation.replyTime}}</text>
+          </view>
+          <view class="reply-content">{{evaluation.replyContent}}</view>
+        </view>
+
+        <view class="reply-form" wx:else>
+          <textarea class="reply-input" placeholder="请输入您的回复内容..." model:value="{{replyText}}"></textarea>
+          <button class="reply-submit-btn" bindtap="submitReply">提交回复</button>
+        </view>
+      </block>
+      <view class="empty-eval" wx:else>
+        <image class="empty-eval-icon" src="/assets/empty-star.png" wx:if="{{false}}"></image>
+        <text>业主暂未评价</text>
+      </view>
+    </view>
+
+  </view> <!-- End content-body -->
+
+  <!-- 底部浮动操作栏 (非维修中) -->
+  <view class="bottom-bar-wrapper" wx:if="{{order.status !== '维修中' && order.status !== '已完成'}}">
+    <button class="bottom-float-btn accept-btn" wx:if="{{order.status === '待处理' || order.status === '已指派'}}" bindtap="handleAction" data-action="accept">立即接单</button>
+  </view>
+  
+</view>

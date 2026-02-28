@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.modules.system.stats.mapper.StatsMapper">
+    <select id="countUsers" resultType="int">
+        SELECT COUNT(*) FROM user WHERE status IN (1,2,3)
+    </select>
+    <select id="countAdmins" resultType="int">
+        SELECT COUNT(*) FROM admin WHERE status = 1
+    </select>
+    <select id="countForumPosts" resultType="int">
+        SELECT COUNT(*) FROM forum_post WHERE status IN (1,2,3)
+    </select>
+    <select id="countForumComments" resultType="int">
+        SELECT COUNT(*) FROM forum_comment WHERE status = 1
+    </select>
+    <select id="countTravelPassToday" resultType="int">
+        SELECT COUNT(*) FROM travel_pass_record WHERE DATE(issue_time) = CURDATE()
+    </select>
+    <select id="loginTrend" resultType="map">
+        SELECT DATE_FORMAT(login_time, '%Y-%m-%d') AS date, COUNT(*) AS cnt
+        FROM login_log
+        WHERE login_time >= DATE_SUB(CURDATE(), INTERVAL #{days} DAY)
+        GROUP BY DATE_FORMAT(login_time, '%Y-%m-%d')
+        ORDER BY date
+    </select>
+    <select id="postTrend" resultType="map">
+        SELECT DATE_FORMAT(created_time, '%Y-%m-%d') AS date, COUNT(*) AS cnt
+        FROM forum_post
+        WHERE created_time >= DATE_SUB(CURDATE(), INTERVAL #{days} DAY)
+        GROUP BY DATE_FORMAT(created_time, '%Y-%m-%d')
+        ORDER BY date
+    </select>
+    <select id="commentTrend" resultType="map">
+        SELECT DATE_FORMAT(created_time, '%Y-%m-%d') AS date, COUNT(*) AS cnt
+        FROM forum_comment
+        WHERE created_time >= DATE_SUB(CURDATE(), INTERVAL #{days} DAY)
+        GROUP BY DATE_FORMAT(created_time, '%Y-%m-%d')
+        ORDER BY date
+    </select>
+    <select id="travelTrend" resultType="map">
+        SELECT DATE_FORMAT(issue_time, '%Y-%m-%d') AS date, COUNT(*) AS cnt
+        FROM travel_pass_record
+        WHERE issue_time >= DATE_SUB(CURDATE(), INTERVAL #{days} DAY)
+        GROUP BY DATE_FORMAT(issue_time, '%Y-%m-%d')
+        ORDER BY date
+    </select>
+</mapper>

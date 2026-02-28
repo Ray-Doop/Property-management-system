@@ -1,0 +1,254 @@
+.container {
+  padding: 32rpx;
+  background-color: #f3f5f9;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.bg-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 260rpx;
+  background: linear-gradient(180deg, #2f6df6 0%, #5b8cff 100%);
+  border-bottom-left-radius: 60rpx;
+  border-bottom-right-radius: 60rpx;
+  z-index: 0;
+}
+
+.hero-card {
+  background: #ffffff;
+  border-radius: 24rpx;
+  width: 100%;
+  padding: 28rpx 28rpx 24rpx;
+  box-shadow: 0 12rpx 30rpx rgba(30, 64, 175, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  z-index: 1;
+  margin-top: 20rpx;
+}
+
+.profile {
+  display: flex;
+  align-items: center;
+  gap: 18rpx;
+}
+
+.avatar {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 50%;
+  border: 2rpx solid #e5e7eb;
+  background: #f8fafc;
+}
+
+.profile-text {
+  display: flex;
+  flex-direction: column;
+  gap: 6rpx;
+}
+
+.name {
+  font-size: 34rpx;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.type {
+  font-size: 22rpx;
+  color: #2563eb;
+  background: #e8f0ff;
+  padding: 4rpx 14rpx;
+  border-radius: 999rpx;
+  width: fit-content;
+}
+
+.status-chip {
+  font-size: 22rpx;
+  color: #16a34a;
+  background: #dcfce7;
+  padding: 6rpx 14rpx;
+  border-radius: 999rpx;
+}
+
+.qr-card {
+  background: #ffffff;
+  border-radius: 28rpx;
+  width: 100%;
+  padding: 36rpx 32rpx 32rpx;
+  margin-top: 22rpx;
+  box-shadow: 0 18rpx 36rpx rgba(15, 23, 42, 0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+
+.qr-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #0f172a;
+  margin-bottom: 6rpx;
+}
+
+.qr-subtitle {
+  font-size: 24rpx;
+  color: #64748b;
+  margin-bottom: 24rpx;
+}
+
+.qr-box {
+  width: 420rpx;
+  height: 420rpx;
+  border-radius: 22rpx;
+  background: #f8fafc;
+  border: 1rpx solid #e2e8f0;
+  margin-bottom: 18rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.qr-code {
+  width: 100%;
+  height: 100%;
+}
+
+.loading-qr {
+  color: #94a3b8;
+  font-size: 28rpx;
+}
+
+.refresh-tip {
+  font-size: 24rpx;
+  color: #2563eb;
+  margin-bottom: 24rpx;
+}
+
+.info {
+  width: 100%;
+  border-top: 1rpx solid #eef2f7;
+  padding-top: 24rpx;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 14rpx;
+}
+
+.label {
+  color: #64748b;
+  font-size: 28rpx;
+}
+
+.value {
+  color: #0f172a;
+  font-size: 28rpx;
+  font-weight: 600;
+}
+
+.tips {
+  color: #6b7280;
+  font-size: 26rpx;
+  margin-top: 28rpx;
+}
+
+.action-bar {
+  margin-top: 28rpx;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  gap: 20rpx;
+}
+
+.btn-share, .btn-history, .btn-apply {
+  flex: 1;
+  font-size: 28rpx;
+  padding: 20rpx 0;
+  border-radius: 16rpx;
+  background: #ffffff;
+  color: #2563eb;
+  text-align: center;
+  border: 1rpx solid #dbe7ff;
+  line-height: 1.5;
+}
+
+.btn-share::after, .btn-history::after, .btn-apply::after {
+  border: none;
+}
+
+/* Modal Styles */
+.modal-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: var(--card-bg);
+  width: 600rpx;
+  border-radius: 20rpx;
+  padding: 40rpx;
+  box-shadow: var(--card-shadow);
+}
+
+.modal-title {
+  font-size: 34rpx;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 40rpx;
+}
+
+.form-item {
+  margin-bottom: 30rpx;
+}
+
+.form-label {
+  display: block;
+  font-size: 28rpx;
+  color: var(--text-secondary);
+  margin-bottom: 10rpx;
+}
+
+.modal-input {
+  background: var(--bg-color);
+  padding: 20rpx;
+  border-radius: 14rpx;
+  font-size: 28rpx;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 40rpx;
+}
+
+.btn-cancel-modal {
+  width: 240rpx;
+  background: var(--bg-color);
+  color: var(--text-secondary);
+  font-size: 30rpx;
+}
+
+.btn-confirm-modal {
+  width: 240rpx;
+  background: var(--primary-color);
+  color: #fff;
+  font-size: 30rpx;
+}

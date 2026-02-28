@@ -1,0 +1,31 @@
+<view class="container">
+  <view class="form-card">
+    <view class="form-item">
+      <text class="label">公告标题</text>
+      <input class="input" placeholder="请输入标题" placeholder-class="placeholder" model:value="{{title}}" />
+    </view>
+    <view class="form-item">
+      <text class="label">公告内容</text>
+      <textarea class="textarea" placeholder="请输入公告详细内容..." placeholder-class="placeholder" model:value="{{content}}" maxlength="-1"></textarea>
+    </view>
+    <view class="form-item">
+      <view class="label-row">
+        <text class="label">附件图片</text>
+        <text class="label-tip">最多9张</text>
+      </view>
+      <view class="image-list">
+        <view class="image-item" wx:for="{{images}}" wx:key="*this">
+          <image src="{{item}}" mode="aspectFill" bindtap="previewImage" data-current="{{item}}"></image>
+          <view class="delete-btn" catchtap="deleteImage" data-index="{{index}}">×</view>
+        </view>
+        <view class="upload-btn" bindtap="chooseImages" wx:if="{{images.length < 9}}">
+          <text class="plus">+</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="footer">
+    <button class="btn-submit" hover-class="btn-hover" bindtap="handleSubmit">提交审核</button>
+  </view>
+</view>

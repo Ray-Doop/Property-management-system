@@ -1,0 +1,118 @@
+.register-container {
+  background: var(--bg-color);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.header-section {
+  padding: 40rpx 40rpx 20rpx;
+  background: var(--card-bg);
+  box-shadow: var(--card-shadow);
+}
+
+.page-title {
+  font-size: 48rpx;
+  font-weight: bold;
+  color: var(--text-main);
+  display: block;
+  margin-bottom: 10rpx;
+}
+
+.page-desc {
+  font-size: 26rpx;
+  color: var(--text-placeholder);
+}
+
+.form-scroll {
+  flex: 1;
+  padding: 20rpx 30rpx;
+  box-sizing: border-box;
+}
+
+.form-card {
+  background: var(--card-bg);
+  padding: 30rpx;
+  border-radius: 20rpx;
+  margin-bottom: 30rpx;
+  box-shadow: var(--card-shadow);
+}
+
+.card-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: var(--text-main);
+  margin-bottom: 30rpx;
+  padding-left: 20rpx;
+  border-left: 8rpx solid var(--primary-color);
+}
+
+.input-item {
+  display: flex;
+  align-items: center;
+  padding: 24rpx 0;
+  border-bottom: 1rpx solid var(--border-color);
+}
+
+.input-item.no-border {
+  border-bottom: none;
+}
+
+.label {
+  width: 160rpx;
+  font-size: 28rpx;
+  color: var(--text-main);
+}
+
+.input {
+  flex: 1;
+  font-size: 28rpx;
+  color: var(--text-main);
+}
+
+.value-text {
+  flex: 1;
+  font-size: 28rpx;
+  color: var(--text-secondary);
+}
+
+.house-inputs {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20rpx;
+}
+
+.mini-input-box {
+  background: var(--bg-color);
+  border-radius: 16rpx;
+  padding: 16rpx 20rpx;
+  display: flex;
+  align-items: center;
+  width: 28%;
+}
+
+.mini-input {
+  flex: 1;
+  font-size: 28rpx;
+  text-align: center;
+}
+
+.suffix {
+  font-size: 24rpx;
+  color: var(--text-secondary);
+  margin-left: 10rpx;
+}
+
+.bottom-action {
+  background: var(--card-bg);
+  padding: 30rpx 40rpx;
+  box-shadow: 0 -6rpx 20rpx rgba(15, 23, 42, 0.08);
+}
+
+.btn-primary {
+  background: var(--primary-color);
+  color: #fff;
+  border-radius: 44rpx;
+  font-size: 32rpx;
+  font-weight: bold;
+}

@@ -1,0 +1,162 @@
+<view class="container detail-page {{showEmojiPanel ? 'page-emoji-open' : ''}}" wx:if="{{post}}">
+  <view class="detail-card">
+    <view class="detail-header">
+      <image class="detail-avatar" src="{{post.avatarUrl || defaultAvatar}}" mode="aspectFill"></image>
+      <view class="detail-meta">
+        <view class="meta-row">
+          <text class="detail-name">{{post.nickname}}</text>
+          <text class="detail-role">{{post.authorType || '业主'}}</text>
+        </view>
+        <text class="detail-time">{{post.createdTime}}</text>
+      </view>
+    </view>
+
+    <view class="detail-body">
+      <text class="detail-title">{{post.title}}</text>
+      <text class="detail-content">{{post.content}}</text>
+    </view>
+
+    <view class="detail-images" wx:if="{{post.images && post.images.length > 0}}">
+      <image
+        class="detail-image {{post.images.length === 1 ? 'detail-image-single' : ''}}"
+        wx:for="{{post.images}}"
+        wx:for-item="img"
+        wx:key="url"
+        src="{{img.url}}"
+        mode="aspectFill"
+        bindtap="previewImage"
+        data-current="{{img.url}}"
+      ></image>
+    </view>
+
+    <view class="detail-actions">
+      <view class="detail-action" bindtap="toggleCollect">
+        <text class="iconfont">{{isCollected ? '★' : '☆'}}</text>
+        <text>{{isCollected ? ' 已收藏' : ' 收藏'}}</text>
+      </view>
+      <view class="detail-action">
+        <text class="iconfont">💬</text>
+        <text> {{post.commentCount || 0}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="comments-card">
+    <view class="comments-header">
+      <text class="comments-title">评论</text>
+      <text class="comments-count">{{post.commentCount || 0}}</text>
+    </view>
+    <block wx:if="{{post.comments && post.comments.length > 0}}">
+      <view class="comment-item" wx:for="{{post.comments}}" wx:key="commentId">
+        <image class="comment-avatar" src="{{item.avatarUrl || defaultAvatar}}" mode="aspectFill"></image>
+        <view class="comment-body">
+          <view class="comment-top">
+            <view class="comment-info">
+              <text class="comment-user">{{item.nickname}}</text>
+              <text class="comment-role">{{item.authorType || '业主'}}</text>
+            </view>
+            <view class="comment-like" bindtap="toggleLike" data-id="{{item.commentId}}">
+              <text class="iconfont {{item.isLiked ? 'active' : ''}}">👍</text>
+              <text class="count">{{item.likeCount || 0}}</text>
+            </view>
+          </view>
+          <text class="comment-text">{{item.content}}</text>
+          <view class="comment-images" wx:if="{{item.attachments && item.attachments.length > 0}}">
+            <image
+              class="comment-image"
+              wx:for="{{item.attachments}}"
+              wx:key="attachmentId"
+              src="{{item.url || item.filePath}}"
+              mode="aspectFill"
+              bindtap="previewImage"
+              data-current="{{item.url || item.filePath}}"
+              data-urls="{{item.attachments}}"
+            ></image>
+          </view>
+          <view class="reply-list" wx:if="{{item.replies && item.replies.length > 0}}">
+            <view class="reply-item" wx:for="{{item.replies}}" wx:key="commentId">
+              <image class="reply-avatar" src="{{item.avatarUrl || defaultAvatar}}" mode="aspectFill"></image>
+              <view class="reply-body">
+                <view class="reply-meta">
+                  <text class="reply-name">{{item.nickname}}</text>
+                  <text class="reply-role">{{item.authorType || '业主'}}</text>
+                  <text class="reply-time">{{item.createdTime}}</text>
+                </view>
+                <text class="reply-content">{{item.content}}</text>
+                <view class="reply-images" wx:if="{{item.attachments && item.attachments.length > 0}}">
+                  <image
+                    class="reply-image"
+                    wx:for="{{item.attachments}}"
+                    wx:key="attachmentId"
+                    src="{{item.url || item.filePath}}"
+                    mode="aspectFill"
+                    bindtap="previewImage"
+                    data-current="{{item.url || item.filePath}}"
+                    data-urls="{{item.attachments}}"
+                  ></image>
+                </view>
+              </view>
+            </view>
+          </view>
+          <view class="comment-footer">
+            <text class="comment-time">{{item.createdTime}}</text>
+            <view class="comment-reply" bindtap="startReply" data-id="{{item.commentId}}" data-nickname="{{item.nickname}}">回复</view>
+          </view>
+        </view>
+      </view>
+    </block>
+    <view class="empty-comment" wx:else>暂无评论，快来抢沙发</view>
+  </view>
+
+  <view class="footer-input-wrapper">
+    <view class="reply-banner" wx:if="{{replyToCommentId}}">
+      <text class="reply-text">回复 @{{replyToNickname}}</text>
+      <view class="reply-cancel" bindtap="cancelReply">取消</view>
+    </view>
+    <!-- 图片预览区 -->
+    <view class="image-preview-area" wx:if="{{commentImages.length > 0}}">
+      <view class="preview-item" wx:for="{{commentImages}}" wx:key="*this">
+        <image class="preview-img" src="{{item}}" mode="aspectFill"></image>
+        <view class="preview-del" bindtap="deleteImage" data-index="{{index}}">×</view>
+      </view>
+      <view class="preview-add" bindtap="chooseImage" wx:if="{{commentImages.length < 9}}">+</view>
+    </view>
+
+    <!-- 微信风格输入栏 -->
+    <view class="wechat-bar">
+      <view class="input-container">
+        <textarea 
+          class="wechat-input" 
+          placeholder="{{replyToNickname ? ('回复 @' + replyToNickname) : '输入评论...'}}" 
+          value="{{commentContent}}" 
+          auto-height="true" 
+          maxlength="300" 
+          bindinput="bindInput"
+          bindfocus="handleInputFocus"
+          focus="{{inputFocus}}"
+          cursor-spacing="20"
+          show-confirm-bar="{{false}}"
+        ></textarea>
+      </view>
+
+      <view class="tool-icon emoji-icon" bindtap="showEmojiPanel">
+        <text class="iconfont icon-emoji">☺</text>
+      </view>
+
+      <view class="tool-icon image-icon" bindtap="chooseImage">
+        <text class="iconfont icon-plus">+</text>
+      </view>
+
+      <view class="tool-icon send-icon" bindtap="sendComment" wx:if="{{commentContent || commentImages.length > 0}}">
+        <text class="btn-send-text">发送</text>
+      </view>
+    </view>
+    <view class="emoji-panel" wx:if="{{showEmojiPanel}}">
+      <view class="emoji-grid">
+        <text class="emoji-item" wx:for="{{emojiList}}" wx:key="*this" bindtap="insertEmoji" data-emoji="{{item}}">{{item}}</text>
+      </view>
+    </view>
+    <!-- 底部安全区适配 -->
+    <view class="safe-area"></view>
+  </view>
+</view>

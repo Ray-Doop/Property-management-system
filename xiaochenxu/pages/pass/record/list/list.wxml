@@ -1,0 +1,30 @@
+<view class="container">
+  <block wx:if="{{list.length > 0}}">
+    <view class="record-item" wx:for="{{list}}" wx:key="id" bindtap="goToDetail" data-id="{{item.id}}">
+      <view class="record-header">
+        <text class="time">申请时间: {{item.issueTimeStr}}</text>
+        <text class="status status-{{item.status}}">{{item.status === 'ISSUED' ? '已生成' : (item.status === 'ENTERED' ? '已入场' : '已出场')}}</text>
+      </view>
+      <view class="record-content">
+        <view class="row">
+          <text class="label">车辆信息</text>
+          <text class="value">{{item.hasVehicle ? item.plateNumber : '无车辆'}}</text>
+        </view>
+        <view class="row">
+          <text class="label">有效期至</text>
+          <text class="value">{{item.expireTimeStr}}</text>
+        </view>
+        <view class="row" wx:if="{{item.fee > 0}}">
+          <text class="label">停车费用</text>
+          <text class="value fee">¥{{item.fee}}</text>
+        </view>
+      </view>
+    </view>
+    <view class="loading" wx:if="{{loading}}">加载中...</view>
+    <view class="no-more" wx:if="{{!hasMore && !loading}}">没有更多了</view>
+  </block>
+  <view class="empty" wx:else>
+    <image src="/assets/qr-placeholder.png" mode="aspectFit"></image>
+    <text>暂无申请记录</text>
+  </view>
+</view>

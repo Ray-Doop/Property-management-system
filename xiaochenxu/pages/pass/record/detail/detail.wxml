@@ -1,0 +1,44 @@
+<view class="container">
+  <view class="card">
+    <view class="header">
+      <text class="title">通行记录详情</text>
+      <text class="status status-{{record.status}}">{{record.status === 'ISSUED' ? '已生成' : (record.status === 'ENTERED' ? '已入场' : '已出场')}}</text>
+    </view>
+
+    <view class="qr-section" wx:if="{{qrCode}}">
+      <image class="qr-code" src="{{qrCode}}" mode="aspectFit"></image>
+      <text class="qr-tip">动态二维码，每分钟刷新</text>
+    </view>
+    <view class="qr-section expired" wx:else>
+      <image class="qr-placeholder" src="/assets/qr-placeholder.png" mode="aspectFit"></image>
+      <text class="qr-tip">二维码已失效或不可用</text>
+    </view>
+
+    <view class="info-list">
+      <view class="item">
+        <text class="label">车牌号</text>
+        <text class="value">{{record.hasVehicle ? record.plateNumber : '无车辆'}}</text>
+      </view>
+      <view class="item">
+        <text class="label">生成时间</text>
+        <text class="value">{{record.issueTimeStr}}</text>
+      </view>
+      <view class="item">
+        <text class="label">有效期至</text>
+        <text class="value">{{expireTimeStr}}</text>
+      </view>
+      <view class="item" wx:if="{{record.entryTime}}">
+        <text class="label">入场时间</text>
+        <text class="value">{{record.entryTime}}</text>
+      </view>
+      <view class="item" wx:if="{{record.exitTime}}">
+        <text class="label">出场时间</text>
+        <text class="value">{{record.exitTime}}</text>
+      </view>
+      <view class="item" wx:if="{{record.fee > 0}}">
+        <text class="label">停车费用</text>
+        <text class="value fee">¥{{record.fee}}</text>
+      </view>
+    </view>
+  </view>
+</view>

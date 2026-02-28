@@ -1,0 +1,58 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/login/login",
+    "pages/register/register",
+    "pages/forum/index/index",
+    "pages/forum/detail/detail",
+    "pages/forum/publish/publish",
+    "pages/profile/index/index",
+    "pages/profile/edit/edit",
+    "pages/profile/change-password/change-password",
+    "pages/notice/list/list",
+    "pages/notice/detail/detail",
+    "pages/repair/list/list",
+    "pages/repair/submit/submit",
+    "pages/repair/detail/detail",
+    "pages/pay/list/list",
+    "pages/pay/sandbox/sandbox",
+    "pages/pass/index/index",
+    "pages/pass/record/list/list",
+    "pages/pass/record/detail/detail"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#fff",
+    "navigationBarTitleText": "智慧物业",
+    "navigationBarTextStyle": "black"
+  },
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#07c160",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页",
+        "iconPath": "assets/tabbar/home.png",
+        "selectedIconPath": "assets/tabbar/home-active.png"
+      },
+      {
+        "pagePath": "pages/forum/index/index",
+        "text": "社区圈",
+        "iconPath": "assets/tabbar/forum.png",
+        "selectedIconPath": "assets/tabbar/forum-active.png"
+      },
+      {
+        "pagePath": "pages/profile/index/index",
+        "text": "我的",
+        "iconPath": "assets/tabbar/profile.png",
+        "selectedIconPath": "assets/tabbar/profile-active.png"
+      }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}

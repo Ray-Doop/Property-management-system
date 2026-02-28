@@ -1,0 +1,48 @@
+<view class="container">
+  <view class="hero">
+    <view class="hero-title">社区公告</view>
+    <view class="hero-sub">及时掌握社区最新动态</view>
+    <view class="search-card">
+      <text class="search-icon">🔍</text>
+      <input class="search-input" placeholder="搜索公告标题" value="{{keyword}}" bindinput="onKeywordInput" bindconfirm="onSearch" confirm-type="search" />
+      <text class="clear-icon" wx:if="{{keyword}}" bindtap="clearKeyword">×</text>
+      <view class="search-action" bindtap="onSearch">搜索</view>
+    </view>
+    <view class="tab-row">
+      <view class="tab-item {{currentTab === null ? 'active' : ''}}" bindtap="switchTab" data-tab="">全部</view>
+      <view class="tab-item {{currentTab === 0 ? 'active' : ''}}" bindtap="switchTab" data-tab="0">未读</view>
+      <view class="tab-item {{currentTab === 1 ? 'active' : ''}}" bindtap="switchTab" data-tab="1">已读</view>
+    </view>
+  </view>
+
+  <block wx:if="{{list.length > 0}}">
+    <view class="notice-item" wx:for="{{list}}" wx:key="noticeId" bindtap="goToDetail" data-id="{{item.noticeId}}">
+      <view class="notice-top">
+        <view class="title-wrap">
+          <view class="accent-bar"></view>
+          <text class="title">{{item.title}}</text>
+        </view>
+        <view class="status-pill {{item.isRead == 1 ? 'status-read' : 'status-unread'}}">
+          <text class="status-dot"></text>
+          {{item.isRead == 1 ? '已读' : '未读'}}
+        </view>
+      </view>
+      <view class="notice-content">{{item.content}}</view>
+      <view class="notice-meta">
+        <view class="meta-left">
+          <text class="publisher">{{item.publisherName || '管理员'}}</text>
+        </view>
+        <view class="meta-right">
+          <text class="time">{{item.publishTime}}</text>
+          <text class="arrow">›</text>
+        </view>
+      </view>
+    </view>
+    <view class="loading" wx:if="{{loading}}">加载中...</view>
+    <view class="no-more" wx:if="{{!hasMore && !loading}}">没有更多了</view>
+  </block>
+  <view class="empty" wx:else>
+    <image src="/assets/qr-placeholder.png" mode="aspectFit"></image>
+    <text>暂无公告</text>
+  </view>
+</view>

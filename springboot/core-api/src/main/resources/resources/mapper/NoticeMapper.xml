@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.modules.business.notice.mapper.NoticeMapper">
+    <insert id="publish" parameterType="com.example.entity.notice.Notice" useGeneratedKeys="true" keyProperty="noticeId">
+        INSERT INTO notice (title, content, publish_time, publisher_id, publisher_name, remark, status, publisher_type)
+        VALUES (#{title}, #{content}, COALESCE(NULLIF(#{publishTime}, ''), NOW()), #{publisherId}, #{publisherName}, #{remark}, #{status}, #{publisherType})
+    </insert>
+
+    <insert id="saveDraft" parameterType="com.example.entity.notice.Notice" useGeneratedKeys="true" keyProperty="noticeId">
+        INSERT INTO notice (title, content, publish_time, publisher_id, publisher_name, remark, status, publisher_type)
+        VALUES (#{title}, #{content}, COALESCE(NULLIF(#{publishTime}, ''), NOW()), #{publisherId}, #{publisherName}, #{remark}, 0, #{publisherType})
+    </insert>
+
+
+    <insert id="insertAttachments" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="attachmentId">
+        INSERT INTO notice_attachment (file_url, file_type, upload_time, notice_id)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.fileUrl}, #{item.fileType}, NOW(), #{item.noticeId})
+        </foreach>
+    </insert>
+
+
+
+    <select id="selectAllNotice" resultType="com.example.entity.notice.Notice">
+        SELECT 
+            n.*,
+            COALESCE(nr.read_status, 0) as isRead
+        FROM notice n
+        LEFT JOIN user u ON u.user_id = #{currentUserId}
+        LEFT JOIN notice_read nr ON n.notice_id = nr.notice_id AND nr.residence_id = u.residence_id
+        <where>
+            <if test="title != null and title != ''">
+                AND n.title LIKE CONCAT('%', #{title}, '%')
+            </if>
+            <if test="status != null">
+                AND n.status = #{status}
+            </if>
+            <if test="publisherId != null">
+                AND n.publisher_id = #{publisherId}
+            </if>
+            <if test="publisherType != null and publisherType != ''">
+                AND n.publisher_type = #{publisherType}
+            </if>
+            <if test="queryReadStatus != null">
+                <if test="queryReadStatus == 1">
+                    AND nr.read_status = 1
+                </if>
+                <if test="queryReadStatus == 0">
+                    AND (nr.read_status IS NULL OR nr.read_status = 0)
+                </if>
+            </if>
+        </where>
+        ORDER BY n.publish_time DESC
+    </select>
+
+    <resultMap id="NoticeWithAttachments" type="com.example.entity.notice.Notice">
+        <id property="noticeId" column="notice_id"/>
+        <result property="title" column="title"/>
+        <result property="content" column="content"/>
+        <result property="publishTime" column="publish_time"/>
+        <result property="publisherId" column="publisher_id"/>
+        <result property="publisherName" column="publisher_name"/>
+        <result property="publisherType" column="publisher_type"/>
+        <result property="targetResidenceId" column="target_residence_id"/>
+        <result property="status" column="status"/>
+        <result property="remark" column="remark"/>
+        <collection property="attachments" ofType="com.example.entity.notice.NoticeAttachment">
+            <id property="attachmentId" column="attachment_id"/>
+            <result property="fileUrl" column="file_url"/>
+            <result property="fileType" column="file_type"/>
+            <result property="uploadTime" column="upload_time"/>
+            <result property="noticeId" column="notice_id"/>
+        </collection>
+    </resultMap>
+
+    <select id="selectById" resultMap="NoticeWithAttachments">
+        SELECT 
+            n.*,
+            na.attachment_id,
+            na.file_url,
+            na.file_type,
+            na.upload_time
+        FROM notice n
+        LEFT JOIN notice_attachment na ON n.notice_id = na.notice_id
+        WHERE n.notice_id = #{noticeId}
+    </select>
+    
+    <update id="updateStatus">
+        UPDATE notice
+        SET status = #{status}
+        WHERE notice_id = #{noticeId}
+    </update>
+
+    <update id="publishDueDrafts">
+        UPDATE notice
+        SET status = 1
+        WHERE status = 0 AND publish_time &lt;= NOW()
+    </update>
+    
+    <select id="selectReadList" resultType="com.example.entity.notice.NoticeRead">
+        SELECT * FROM notice_read WHERE notice_id = #{noticeId} AND read_status = 1
+    </select>
+    <select id="selectUnreadList" resultType="com.example.entity.notice.NoticeRead">
+        SELECT * FROM notice_read WHERE notice_id = #{noticeId} AND read_status = 0
+    </select>
+
+    <insert id="insertReadRecord">
+        INSERT INTO notice_read (notice_id, residence_id, read_status, read_time)
+        VALUES (#{noticeId}, #{residenceId}, 1, NOW())
+        ON DUPLICATE KEY UPDATE read_time = NOW(), read_status = 1
+    </insert>
+    
+    <select id="selectSummary" resultType="map">
+        SELECT 
+            n.notice_id AS noticeId,
+            n.title,
+            n.publish_time AS publishTime,
+            n.status AS status,
+            COALESCE(COUNT(nr.id), 0) AS total,
+            COALESCE(SUM(CASE WHEN nr.read_status = 1 THEN 1 ELSE 0 END), 0) AS readCount,
+            COALESCE(SUM(CASE WHEN nr.read_status = 0 THEN 1 ELSE 0 END), 0) AS unreadCount
+        FROM notice n
+        LEFT JOIN notice_read nr ON nr.notice_id = n.notice_id
+        <where>
+            <if test="title != null and title != ''">
+                AND n.title LIKE CONCAT('%', #{title}, '%')
+            </if>
+        </where>
+        GROUP BY n.notice_id
+        ORDER BY n.publish_time DESC
+    </select>
+
+    <select id="selectDueDraftNoticeIds" resultType="long">
+        SELECT notice_id
+        FROM notice
+        WHERE status = 0 AND publish_time &lt;= NOW()
+    </select>
+    
+    <select id="selectReadTable" resultType="map">
+        SELECT 
+            nr.notice_id AS noticeId,
+            nr.residence_id AS residenceId,
+            nr.read_status AS readStatus,
+            nr.read_time AS readTime,
+            u.user_id AS userId,
+            u.nickname,
+            u.avatar_url AS avatarUrl,
+            u.building_no AS buildingNo,
+            u.unit_no AS unitNo,
+            u.room_no AS roomNo,
+            u.phone
+        FROM notice_read nr
+        LEFT JOIN user u ON u.residence_id = nr.residence_id
+        WHERE nr.notice_id = #{noticeId}
+        <if test="readStatus != null">AND nr.read_status = #{readStatus}</if>
+        <if test="keyword != null and keyword != ''">
+            AND (u.username LIKE CONCAT('%', #{keyword}, '%')
+                 OR u.nickname LIKE CONCAT('%', #{keyword}, '%')
+                 OR u.phone LIKE CONCAT('%', #{keyword}, '%')
+                 OR nr.residence_id LIKE CONCAT('%', #{keyword}, '%'))
+        </if>
+        ORDER BY u.building_no, u.unit_no, u.room_no
+    </select>
+    
+    <update id="updateReadStatus">
+        UPDATE notice_read
+        SET read_status = #{readStatus},
+        read_time = CASE WHEN #{readStatus} = 1 THEN NOW() ELSE read_time END
+        WHERE notice_id = #{noticeId} AND residence_id = #{residenceId}
+    </update>
+
+    <insert id="initReadRecords">
+        INSERT IGNORE INTO notice_read (notice_id, residence_id, read_status)
+        SELECT #{noticeId}, residence_id, 0
+        FROM user
+        WHERE residence_id IS NOT NULL AND residence_id != ''
+        GROUP BY residence_id
+    </insert>
+    
+    <!-- 删除公告附件 -->
+    <delete id="deleteNoticeAttachments">
+        DELETE FROM notice_attachment WHERE notice_id = #{noticeId};
+    </delete>
+    
+    <!-- 删除公告阅读记录 -->
+    <delete id="deleteNoticeReadRecords">
+        DELETE FROM notice_read WHERE notice_id = #{noticeId};
+    </delete>
+    
+    <!-- 删除公告本身 -->
+    <delete id="deleteNotice">
+        DELETE FROM notice WHERE notice_id = #{noticeId};
+    </delete>
+
+    <select id="countTotal" resultType="long">
+        SELECT count(*) FROM notice
+    </select>
+
+    <select id="countTodayPublished" resultType="long">
+        SELECT count(*) FROM notice 
+        WHERE status = 1 
+        AND DATE(publish_time) = CURDATE()
+    </select>
+
+    <select id="countPendingAudit" resultType="long">
+        SELECT count(*) FROM notice WHERE status = 2
+    </select>
+</mapper>

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.modules.business.fee.mapper.FeeBillMapper">
+
+    <resultMap id="BaseMap" type="com.example.entity.Alipay.FeeBill">
+        <id property="id" column="id"/>
+        <result property="billNo" column="bill_no"/>
+        <result property="residenceId" column="residence_id"/>
+        <result property="title" column="title"/>
+        <result property="unitPrice" column="unit_price"/>
+        <result property="areaSnapshot" column="area_snapshot"/>
+        <result property="periodStart" column="period_start"/>
+        <result property="periodEnd" column="period_end"/>
+        <result property="amount" column="amount"/>
+        <result property="status" column="status"/>
+        <result property="payOrderId" column="pay_order_id"/>
+        <result property="dueDate" column="due_date"/>
+        <result property="remark" column="remark"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <select id="listByResidence" resultMap="BaseMap">
+        <![CDATA[
+        SELECT * FROM fee_bill
+        WHERE residence_id = #{residenceId}
+        ORDER BY created_at DESC
+        ]]>
+    </select>
+
+    <select id="findByIdFromfee" resultMap="BaseMap">
+        <![CDATA[
+        SELECT * FROM fee_bill
+        WHERE id = #{id}
+        ]]>
+    </select>
+
+    <select id="findByBillNo" resultMap="BaseMap">
+        <![CDATA[
+        SELECT * FROM fee_bill
+        WHERE bill_no = #{billNo}
+        ]]>
+    </select>
+    <select id="allBills" resultType="com.example.entity.Alipay.FeeBill">
+        SELECT * FROM fee_bill
+    </select>
+
+    <select id="FilterMonth" resultMap="BaseMap">
+        SELECT * FROM fee_bill
+        where DATE_FORMAT(period_start, '%Y-%m') = DATE_FORMAT(#{periodStart}, '%Y-%m')
+    </select>
+
+
+    <insert id="insertTofee" parameterType="com.example.entity.Alipay.FeeBill" useGeneratedKeys="true" keyProperty="id">
+        <![CDATA[
+        INSERT INTO fee_bill (
+            bill_no, residence_id, title, unit_price, area_snapshot,
+            period_start, period_end, amount, status, due_date, remark
+        ) VALUES (
+                     #{billNo}, #{residenceId}, #{title}, #{unitPrice}, #{areaSnapshot},
+                     #{periodStart}, #{periodEnd}, #{amount}, #{status}, #{dueDate}, #{remark}
+                 )
+        ]]>
+    </insert>
+
+    <update id="updateStatusAndOrder">
+        <![CDATA[
+        UPDATE fee_bill
+        SET status = #{status},
+            pay_order_id = #{payOrderId},
+            updated_at = NOW()
+        WHERE id = #{id}
+        ]]>
+    </update>
+
+    <update id="markPaid">
+        <![CDATA[
+        UPDATE fee_bill
+        SET status = #{status}, updated_at = NOW()
+        WHERE id = #{id} AND status <> 2
+        ]]>
+    </update>
+
+    <select id="findByMonth" resultMap="BaseMap">
+        SELECT * FROM fee_bill
+        WHERE DATE_FORMAT(period_start, '%Y-%m') = #{monthStr}
+    </select>
+
+</mapper>

@@ -1,0 +1,138 @@
+.login-container {
+  background: var(--bg-color);
+  padding: 0 60rpx;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.header-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 80rpx;
+}
+
+.logo-box {
+  width: 140rpx;
+  height: 140rpx;
+  background: #fff;
+  border-radius: 40rpx;
+  box-shadow: var(--card-shadow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 30rpx;
+}
+
+.logo {
+  width: 80rpx;
+  height: 80rpx;
+}
+
+.app-name {
+  font-size: 40rpx;
+  font-weight: bold;
+  color: var(--text-main);
+  margin-bottom: 10rpx;
+}
+
+.slogan {
+  font-size: 26rpx;
+  color: var(--text-placeholder);
+  letter-spacing: 4rpx;
+}
+
+.form-section {
+  width: 100%;
+}
+
+.input-item {
+  background: #f7f8fa;
+  border-radius: 16rpx;
+  padding: 24rpx 30rpx;
+  margin-bottom: 30rpx;
+  display: flex;
+  align-items: center;
+}
+
+.input-item:focus-within {
+  background: #fff;
+  box-shadow: 0 0 0 2rpx var(--primary-color);
+}
+
+.input {
+  flex: 1;
+  font-size: 30rpx;
+  color: var(--text-main);
+  height: 44rpx;
+}
+
+.captcha-item {
+  padding-right: 10rpx;
+}
+
+.captcha-img {
+  width: 160rpx;
+  height: 64rpx;
+  border-radius: 8rpx;
+}
+
+.action-links {
+  display: flex;
+  justify-content: space-between;
+  font-size: 26rpx;
+  color: var(--text-secondary);
+  margin-bottom: 60rpx;
+}
+
+.btn-login {
+  background: var(--primary-color);
+  color: #fff;
+  border-radius: 44rpx;
+  font-size: 32rpx;
+  height: 88rpx;
+  font-weight: bold;
+  box-shadow: 0 12rpx 24rpx rgba(60, 127, 255, 0.28);
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  margin: 60rpx 0 40rpx;
+  color: var(--text-placeholder);
+  font-size: 24rpx;
+}
+
+.line {
+  flex: 1;
+  height: 1rpx;
+  background: #eee;
+}
+
+.divider text {
+  margin: 0 20rpx;
+}
+
+.btn-wechat {
+  background: #fff;
+  color: var(--text-main);
+  border: 2rpx solid #eee;
+  border-radius: 44rpx;
+  font-size: 30rpx;
+  height: 88rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-wechat .iconfont {
+  color: var(--primary-color);
+  font-size: 40rpx;
+  margin-right: 16rpx;
+}
+
+.btn-hover {
+  opacity: 0.9;
+  transform: scale(0.98);
+}

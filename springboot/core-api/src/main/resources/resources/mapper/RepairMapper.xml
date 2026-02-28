@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.modules.business.repair.mapper.RepairMapper">
+
+    <!-- 更新报修单状态为已撤销 -->
+    <update id="cancelRepair">
+        UPDATE repair_order
+        SET status='已取消'
+        WHERE order_id=#{orderId}
+    </update>
+
+    <!-- 同步 -->
+    <update id="modificationTime">
+        UPDATE repair_order
+        SET updated_time=Now(),status='已指派'
+        WHERE order_id=#{orderId}
+    </update>
+
+
+    <!-- 查询所有类别 -->
+    <select id="selectCategories" resultType="com.example.entity.repair.RepairCategory">
+        SELECT *
+        FROM repair_category
+    </select>
+
+    <!-- 结果映射：RepairOrder + 类别 + 文件 -->
+    <resultMap id="RepairDetailResultMap" type="com.example.entity.repair.RepairOrder">
+        <id property="orderId" column="order_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="categoryId" column="category_id"/>
+        <result property="categoryName" column="category_name"/>
+        <result property="description" column="description"/>
+        <result property="priority" column="priority"/>
+        <result property="status" column="status"/>
+        <result property="createdTime" column="created_time"/>
+        <result property="updatedTime" column="updated_time"/>
+        <result property="appointmentTime" column="appointment_time"/>
+        <result property="assignedWorker" column="assigned_worker"/>
+        <result property="finishedTime" column="finished_time"/>
+        <result property="buildingNo" column="building_no"/>
+        <result property="unitNo" column="unit_no"/>
+        <result property="roomNo" column="room_no"/>
+        <result property="phone" column="phone"/>
+        <result property="name" column="name"/>
+        <result property="evaluation" column="evaluation"/>
+        <result property="rating" column="rating"/>
+
+        <!-- 一对多映射报修文件 -->
+        <collection property="files" ofType="com.example.entity.repair.RepairFile"
+                    select="getRepairFilesByOrderId" column="order_id"/>
+    </resultMap>
+
+    <!-- 查询报修单及类别 -->
+    <resultMap id="RepairOrderWithCategoryResultMap" type="com.example.entity.repair.RepairOrder">
+        <id property="orderId" column="order_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="categoryId" column="category_id"/>
+        <result property="description" column="description"/>
+        <result property="status" column="status"/>
+        <result property="priority" column="priority"/>
+        <result property="createdTime" column="created_time"/>
+        <result property="updatedTime" column="updated_time"/>
+        <result property="appointmentTime" column="appointment_time"/>
+        <result property="assignedWorker" column="assigned_worker"/>
+        <result property="finishedTime" column="finished_time"/>
+        <result property="buildingNo" column="building_no"/>
+        <result property="unitNo" column="unit_no"/>
+        <result property="roomNo" column="room_no"/>
+        <result property="phone" column="phone"/>
+        <result property="evaluation" column="evaluation"/>
+        <result property="rating" column="rating"/>
+
+        <association property="category" javaType="com.example.entity.repair.RepairCategory">
+            <id property="categoryId" column="category_id"/>
+            <result property="categoryName" column="category_name"/>
+        </association>
+    </resultMap>
+
+    <!-- 查询所有报修单及类别 -->
+    <select id="selectMyRepair" resultMap="RepairOrderWithCategoryResultMap">
+        SELECT ro.order_id,
+               ro.user_id,
+               ro.category_id,
+               ro.description,
+               ro.status,
+               ro.priority,
+               ro.created_time,
+               ro.updated_time,
+               ro.appointment_time,
+               ro.assigned_worker,
+               ro.finished_time,
+               ro.building_no,
+               ro.unit_no,
+               ro.room_no,
+               ro.phone,
+               re.content AS evaluation,
+               re.score AS rating,
+               rc.category_name
+        FROM repair_order ro
+                 LEFT JOIN repair_category rc ON ro.category_id = rc.category_id
+                 LEFT JOIN repair_evaluation re ON ro.order_id = re.assignment_id
+        WHERE ro.user_id = #{userId}
+        ORDER BY ro.created_time DESC
+    </select>
+
+    <!-- 查询报修单详情 -->
+    <select id="getRepairDetailByOrderId" resultMap="RepairDetailResultMap">
+        SELECT ro.order_id,
+               ro.user_id,
+               ro.category_id,
+               rc.category_name,
+               ro.description,
+               ro.priority,
+               ro.status,
+               ro.created_time,
+               ro.updated_time,
+               ro.appointment_time,
+               ro.assigned_worker,
+               ro.finished_time,
+               ro.building_no,
+               ro.unit_no,
+               ro.room_no,
+               ro.phone,
+               IFNULL(u.nickname, u.username) AS name,
+               re.content AS evaluation,
+               re.score AS rating,
+               re.reply_content AS replyContent,
+               re.reply_time,
+               e.nickname AS workerName
+        FROM repair_order ro
+                 LEFT JOIN repair_category rc ON ro.category_id = rc.category_id
+                 LEFT JOIN repair_evaluation re ON ro.order_id = re.assignment_id
+                 LEFT JOIN user u ON ro.user_id = u.user_id
+                 LEFT JOIN employee e ON ro.assigned_worker = e.employee_id
+        WHERE ro.order_id = #{orderId}
+    </select>
+
+    <!-- 查询报修单文件 -->
+    <select id="getRepairFilesByOrderId" resultType="com.example.entity.repair.RepairFile">
+        SELECT file_id, order_id, file_url, file_type
+        FROM repair_file
+        WHERE order_id = #{orderId}
+    </select>
+
+    <!-- 插入报修单 -->
+    <insert id="addRepairOrder" parameterType="com.example.entity.repair.RepairOrder"
+            useGeneratedKeys="true" keyProperty="orderId">
+        INSERT INTO repair_order
+        (user_id, category_id, description, priority, created_time, updated_time, assigned_worker, finished_time,
+         building_no, unit_no, room_no, phone, appointment_time)
+        VALUES (#{userId}, #{categoryId}, #{description}, #{priority}, #{createdTime}, #{updatedTime},
+                #{assignedWorker}, #{finishedTime}, #{buildingNo}, #{unitNo}, #{roomNo}, #{phone}, #{appointmentTime})
+    </insert>
+
+    <!-- 插入报修文件 -->
+    <insert id="addRepairFiles" parameterType="com.example.entity.repair.RepairFile">
+        INSERT INTO repair_file
+            (order_id, file_url, file_type, uploaded_at, user_id)
+        VALUES (#{orderId}, #{fileUrl}, #{fileType}, NOW(), #{userID})
+    </insert>
+
+    <!-- 分配报修单 -->
+    <insert id="dispatchOrder" parameterType="com.example.entity.repair.RepairAssignment">
+        INSERT INTO repair_assignment
+            (order_id, worker_id, assigned_by, assigned_time, visiting_time, status)
+        VALUES (#{orderId}, #{workerId}, #{assignedBy}, NOW(), #{visitingTime}, #{status})
+    </insert>
+    
+    <!-- 根据订单查询指派记录 -->
+    <select id="selectAssignmentByOrderId" resultType="com.example.entity.repair.RepairAssignment">
+        SELECT assignment_id, order_id, worker_id, assigned_by, assigned_time, visiting_time, status
+        FROM repair_assignment
+        WHERE order_id = #{orderId}
+        ORDER BY assigned_time DESC
+        LIMIT 1
+    </select>
+
+    <select id="selectStatusByOrderId" resultType="java.lang.String">
+        SELECT status
+        FROM repair_order
+        WHERE order_id = #{orderId}
+    </select>
+
+    <update id="updateAssignmentOnDispatch">
+        update repair_order
+        set assigned_worker = #{workerId},
+            status = #{status},
+            updated_time = NOW()
+        where order_id = #{orderId}
+    </update>
+    
+    <!-- 接单更新指派记录 -->
+    <update id="updateAssignmentOnAccept">
+        UPDATE repair_assignment
+        SET worker_id = #{workerId},
+            status = '已接受',
+            assigned_time = NOW()
+        WHERE order_id = #{orderId}
+    </update>
+    
+    <!-- 接单插入记录 -->
+    <insert id="insertAssignmentOnAccept">
+        INSERT INTO repair_assignment (order_id, worker_id, assigned_by, assigned_time, visiting_time, status)
+        VALUES (#{orderId}, #{workerId}, #{workerId}, NOW(), NULL, '已接受')
+    </insert>
+
+    <!-- 查询所有工单 -->
+    <select id="allRepair" resultMap="RepairDetailResultMap">
+        SELECT * FROM repair_order
+    </select>
+
+    <select id="status" resultMap="RepairDetailResultMap">
+        SELECT * FROM repair_order
+        WHERE status=#{status}
+    </select>
+
+    <!-- 查询符合条件可用维修员 -->
+    <select id="findAvailableWorkers" parameterType="map" resultType="com.example.entity.repair.RepairWorker">
+        SELECT rw.*
+        FROM repair_worker rw
+                 INNER JOIN repair_category rc ON rw.specialty LIKE CONCAT('%', rc.category_name, '%')
+        WHERE rc.category_id = #{categoryId}
+          AND rw.worker_id NOT IN (
+            SELECT ra.worker_id
+            FROM repair_assignment ra
+            WHERE ra.visiting_time IS NOT NULL
+              AND ra.visiting_time BETWEEN DATE_SUB(#{appointmentTime}, INTERVAL 1 HOUR)
+                AND DATE_ADD(#{appointmentTime}, INTERVAL 1 HOUR)
+        )
+    </select>
+
+    <select id="findWorkers" resultType="com.example.entity.Employee">
+        SELECT e.*
+        FROM employee e
+        WHERE (e.permission LIKE '%维修%')
+    </select>
+
+    <update id="updateStatus">
+        update repair_order
+        set status = #{status}
+        <if test="finishedTime != null">
+            , finished_time = #{finishedTime}
+        </if>
+        where order_id = #{orderId}
+    </update>
+    
+    <update id="updateWorkerStatus">
+        update repair_order set status = #{status} where order_id = #{orderId}
+    </update>
+    
+    <!-- 员工接单：设置指派员工并置为维修中 -->
+    <update id="acceptByWorker">
+        update repair_order 
+        set assigned_worker = #{workerId}, 
+            status = '维修中',
+            updated_time = NOW()
+        where order_id = #{orderId}
+    </update>
+    
+    <update id="evaluateRepair">
+        INSERT INTO repair_evaluation (assignment_id, user_id, score, content, eval_time)
+        VALUES (#{orderId}, (SELECT user_id FROM repair_order WHERE order_id = #{orderId}), #{rating}, #{evaluation}, NOW())
+    </update>
+    
+    <!-- 获取订单评价（最新一条） -->
+    <select id="getEvaluationByOrderId" resultType="com.example.entity.repair.RepairEvaluation">
+        SELECT * FROM repair_evaluation
+        WHERE assignment_id = #{orderId}
+        ORDER BY eval_time DESC
+        LIMIT 1
+    </select>
+    
+    <!-- 回复评价 -->
+    <update id="replyEvaluation">
+        UPDATE repair_evaluation
+        SET reply_content = #{replyContent},
+            reply_time = NOW()
+        WHERE assignment_id = #{orderId}
+    </update>
+    
+    <select id="selectByWorker" resultMap="RepairDetailResultMap">
+        SELECT ro.*, rc.category_name
+        FROM repair_order ro
+        LEFT JOIN repair_category rc ON ro.category_id = rc.category_id
+        <where>
+            <if test="workerId != null">AND ro.assigned_worker = #{workerId}</if>
+            <if test="status != null and status != ''">AND ro.status = #{status}</if>
+        </where>
+        ORDER BY ro.updated_time DESC
+    </select>
+    
+    <select id="countByStatus" resultType="java.lang.Long">
+        SELECT count(*) FROM repair_order
+        WHERE status = #{status}
+    </select>
+</mapper>

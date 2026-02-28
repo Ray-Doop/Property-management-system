@@ -1,0 +1,19 @@
+<view class="container">
+  <view class="form-group avatar-group" bindtap="changeAvatar">
+    <view class="label">头像</view>
+    <image class="avatar" src="{{user.avatarUrl || 'http://localhost:8080/files/download/img.jpg'}}"></image>
+    <text class="arrow">></text>
+  </view>
+
+  <view class="form-group">
+    <view class="label">昵称</view>
+    <input class="input" value="{{nickname}}" bindinput="bindNicknameInput" />
+  </view>
+
+  <view class="form-group">
+    <view class="label">手机号</view>
+    <input class="input" value="{{phone}}" bindinput="bindPhoneInput" type="number" />
+  </view>
+
+  <button class="btn-save" bindtap="save">保存</button>
+</view>

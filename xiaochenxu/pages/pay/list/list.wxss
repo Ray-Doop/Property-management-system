@@ -1,0 +1,134 @@
+.container {
+  background-color: var(--bg-color);
+  min-height: 100vh;
+}
+
+.header {
+  padding: 40rpx 30rpx;
+  background: var(--primary-gradient);
+  color: #fff;
+  border-bottom-left-radius: 30rpx;
+  border-bottom-right-radius: 30rpx;
+  margin-bottom: 20rpx;
+}
+
+.address {
+  font-size: 36rpx;
+  font-weight: bold;
+}
+
+.tabs {
+  display: flex;
+  background: var(--card-bg);
+  padding: 0 30rpx;
+  margin: 0 30rpx 20rpx;
+  border-radius: 16rpx;
+  box-shadow: var(--card-shadow);
+}
+
+.tab {
+  flex: 1;
+  text-align: center;
+  padding: 24rpx 0;
+  font-size: 28rpx;
+  color: var(--text-content);
+  position: relative;
+  transition: all 0.2s;
+}
+
+.tab.active {
+  color: var(--primary-color);
+  font-weight: bold;
+  font-size: 30rpx;
+}
+
+.tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40rpx;
+  height: 6rpx;
+  background: var(--primary-color);
+  border-radius: 4rpx;
+}
+
+.bill-item {
+  background: var(--card-bg);
+  margin: 0 30rpx 24rpx;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  box-shadow: var(--card-shadow);
+}
+
+.item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24rpx;
+  border-bottom: 1rpx dashed var(--border-color);
+  padding-bottom: 20rpx;
+}
+
+.title {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: var(--text-main);
+}
+
+.amount {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: var(--danger-color);
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12rpx;
+  font-size: 26rpx;
+}
+
+.label {
+  color: var(--text-secondary);
+}
+
+.value {
+  color: var(--text-content);
+}
+
+.item-footer {
+  margin-top: 24rpx;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-pay {
+  background: var(--primary-gradient);
+  color: #fff;
+  font-size: 26rpx;
+  padding: 12rpx 36rpx;
+  border-radius: 30rpx;
+  margin: 0;
+  box-shadow: 0 10rpx 20rpx rgba(60, 127, 255, 0.25);
+}
+
+.status-text {
+  color: var(--text-placeholder);
+  font-size: 26rpx;
+}
+
+.loading, .no-more, .empty {
+  text-align: center;
+  padding: 30rpx;
+  color: var(--text-placeholder);
+  font-size: 26rpx;
+}
+
+.empty image {
+  width: 200rpx;
+  height: 200rpx;
+  display: block;
+  margin: 100rpx auto 20rpx;
+}
