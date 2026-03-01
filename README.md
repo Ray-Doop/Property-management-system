@@ -2,8 +2,13 @@
 
 本项目由后端服务、管理员端 Web、用户端小程序、员工端小程序四部分组成，围绕物业管理的登录认证、公告、报修、论坛、出行码、缴费与审核等业务实现端到端闭环。
 
+文档索引：
 
-
+- 管理员端：[管理员端.md](file:///e:/grxm/Property%20management%20system/管理员端.md)
+- 用户端小程序：[用户端小程序.md](file:///e:/grxm/Property%20management%20system/用户端小程序.md)
+- 员工端小程序：[员工端小程序.md](file:///e:/grxm/Property%20management%20system/员工端小程序.md)
+- 后端服务：[后端.md](file:///e:/grxm/Property%20management%20system/后端.md)
+- 更新日志：[更新日志.md](file:///e:/grxm/Property%20management%20system/更新日志.md)
 ## 项目结构
 
 ```
@@ -18,7 +23,6 @@ Property management system/
 │  └─ pom.xml                    # 父工程
 ├─ vue_guanliyuan/               # 管理员端（Vue 3 + Vite）
 │  ├─ src/                       # 前端源码
-│  ├─ dist/                      # 构建产物
 │  └─ package.json
 ├─ xiaochenxu_yonghu/            # 用户端小程序
 ├─ xiaochenxu_yuangong/          # 员工端小程序
@@ -131,6 +135,5 @@ mysql -u root -p < 数据库/hr888.sql
 
 ## 其他文档
 
-- [多线程使用指南](/springboot/MULTITHREADING_GUIDE.md)
-- [线程模型详解](/springboot/THREAD_MODEL_EXPLANATION.md)
->>>>>>> 010bde43 (补充md)
+- [多线程使用指南](file:///e:/grxm/Property%20management%20system/springboot/MULTITHREADING_GUIDE.md)
+- [线程模型详解](file:///e:/grxm/Property%20management%20system/springboot/THREAD_MODEL_EXPLANATION.md)
